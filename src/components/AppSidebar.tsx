@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles, BarChart2, Calendar } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles, BarChart2, Calendar, Gift } from 'lucide-react';
 import { useUnreadAlertCount } from '@/hooks/useFinanceData';
 import { useProfile } from '@/hooks/useProfile';
 import { useDemoMode, useDemoPrefix } from '@/hooks/useDemoMode';
@@ -13,6 +13,7 @@ const baseNavItems = [
   { path: '/goals', label: 'Goals', icon: Target },
   { path: '/pulse', label: 'Pulse', icon: Bell, usePulseCount: true },
   { path: '/scheduled', label: 'Scheduled', icon: Calendar },
+  { path: '/offers', label: 'Offers', icon: Gift },
 ];
 
 export function AppSidebar() {
