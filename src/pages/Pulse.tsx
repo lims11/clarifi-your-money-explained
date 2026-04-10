@@ -70,6 +70,3 @@ export default function PulsePage() {
     </div>
   );
 }
-
-// Need Bell import
-import { Bell } from 'lucide-react';
