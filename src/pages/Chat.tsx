@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+// @ts-ignore
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
