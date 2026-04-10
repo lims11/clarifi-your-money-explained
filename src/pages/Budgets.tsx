@@ -288,44 +288,6 @@ export default function BudgetsPage() {
         </div>
       </div>
 
-      {/* Expense donut chart */}
-      {expensePieData.length > 0 && (
-        <div className="clarifi-card mb-6">
-          <h2 className="text-sm font-medium mb-4">{MONTH_NAMES[selectedMonth]} Spending Breakdown</h2>
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="h-52 w-52 flex-shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={expensePieData} dataKey="value" innerRadius={50} outerRadius={90} paddingAngle={2}>
-                    {expensePieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2">
-              {expensePieData.map((d, i) => (
-                <div key={d.name} className="flex items-center gap-2 text-sm">
-                  <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                  <span className="truncate flex-1">{d.name}</span>
-                  <span className="font-medium">{formatCurrency(d.value)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="flex justify-between mt-4 pt-3 border-t border-border">
-            <div>
-              <p className="text-xs text-muted-foreground">Monthly income</p>
-              <p className="text-lg font-bold text-teal">{formatCurrency(totalIncome)}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-muted-foreground">Savings amount</p>
-              <p className={`text-lg font-bold ${savedAmount >= 0 ? 'text-teal' : 'text-coral'}`}>{formatCurrency(savedAmount)}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Budget cards */}
       {budgetsWithSpend.length === 0 ? (
         <div className="clarifi-card text-center py-12"><p className="text-lg font-medium mb-2">No budgets yet</p><p className="text-sm text-muted-foreground mb-4">Create your first budget to track spending</p><Button onClick={() => setShowAdd(true)}>Add budget</Button></div>
