@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { DemoProvider } from '@/hooks/useDemoMode';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -17,6 +18,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  // If not logged in, show demo data instead of redirecting to login
+  if (!user) {
+    return <DemoProvider>{children}</DemoProvider>;
+  }
+
   return <>{children}</>;
 }

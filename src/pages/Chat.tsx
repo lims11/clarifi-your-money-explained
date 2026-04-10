@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useDemoMode } from '@/hooks/useDemoMode';
 import { useAccounts, useMonthTransactions, useBudgets, useGoals, useScheduledTransactions, useChatMessages } from '@/hooks/useFinanceData';
 import { formatCurrency } from '@/lib/finance';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,6 +29,7 @@ const quickActions = ['Summarise my month', 'Find ways to save', 'Am I on track?
 export default function ChatPage() {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
+  const demo = useDemoMode();
   const { data: savedMessages, isLoading: loadingMessages } = useChatMessages();
   const { data: accounts } = useAccounts();
   const { data: transactions } = useMonthTransactions();
@@ -85,7 +87,7 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
 
   const handleSend = async (text?: string) => {
     const msg = text || input.trim();
-    if (!msg || isStreaming || !user) return;
+    if (!msg || isStreaming) return;
 
     const userMsg: Message = { role: 'user', content: msg };
     const newMessages = [...messages, userMsg];
@@ -93,8 +95,10 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
     setInput('');
     setIsStreaming(true);
 
-    // Save user message
-    await supabase.from('chat_messages').insert({ user_id: user.id, role: 'user', content: msg });
+    // Save user message (only if logged in)
+    if (user) {
+      await supabase.from('chat_messages').insert({ user_id: user.id, role: 'user', content: msg });
+    }
 
     // Add empty assistant message for streaming
     setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
@@ -154,8 +158,8 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
         }
       }
 
-      // Save assistant response
-      if (assistantContent) {
+      // Save assistant response (only if logged in)
+      if (assistantContent && user) {
         await supabase.from('chat_messages').insert({ user_id: user.id, role: 'assistant', content: assistantContent });
       }
     } catch (err: unknown) {
@@ -163,7 +167,7 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
       toast.error(errorMessage);
       setMessages(prev => {
         const updated = [...prev];
-        updated[updated.length - 1] = { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' };
+        updated[updated.length - 1] = { role: 'assistant', content: demo ? "I'm in demo mode right now, but in the full app I'd analyse your real financial data and give personalised advice!" : 'Sorry, I encountered an error. Please try again.' };
         return updated;
       });
     } finally {
@@ -304,7 +308,6 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
               <Send size={16} />
             </Button>
           </div>
-          {input.length > 200 && <p className="text-xs text-muted-foreground text-right mt-1 max-w-3xl mx-auto">{input.length} characters</p>}
         </div>
       </div>
     </div>
