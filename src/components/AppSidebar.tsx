@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles } from 'lucide-react';
 import { useUnreadAlertCount } from '@/hooks/useFinanceData';
 import { useProfile } from '@/hooks/useProfile';
-import { useDemoMode } from '@/hooks/useDemoMode';
+import { useDemoMode, useDemoPrefix } from '@/hooks/useDemoMode';
 
 const baseNavItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },

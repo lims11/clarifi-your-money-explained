@@ -48,7 +48,7 @@ const App = () => (
             </Route>
 
             {/* Demo routes — no auth required */}
-            <Route element={<DemoProvider><AppLayout /></DemoProvider>}>
+            <Route element={<DemoProvider usePrefix={true}><AppLayout /></DemoProvider>}>
               <Route path="/demo" element={<Dashboard />} />
               <Route path="/demo/dashboard" element={<Dashboard />} />
               <Route path="/demo/chat" element={<Chat />} />
