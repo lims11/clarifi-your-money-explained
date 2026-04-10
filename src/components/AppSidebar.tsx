@@ -12,6 +12,7 @@ const baseNavItems = [
   { path: '/budgets', label: 'Budgets', icon: PieChart },
   { path: '/goals', label: 'Goals', icon: Target },
   { path: '/pulse', label: 'Pulse', icon: Bell, usePulseCount: true },
+  { path: '/scheduled', label: 'Scheduled', icon: Calendar },
 ];
 
 export function AppSidebar() {
