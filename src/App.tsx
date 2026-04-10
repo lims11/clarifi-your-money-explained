@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
+import { DemoProvider } from "@/hooks/useDemoMode";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import Landing from "./pages/Landing";
@@ -32,6 +33,8 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+
+            {/* Authenticated routes */}
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/chat" element={<Chat />} />
@@ -43,6 +46,21 @@ const App = () => (
               <Route path="/pulse" element={<Pulse />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
+
+            {/* Demo routes — no auth required */}
+            <Route element={<DemoProvider><AppLayout /></DemoProvider>}>
+              <Route path="/demo" element={<Dashboard />} />
+              <Route path="/demo/dashboard" element={<Dashboard />} />
+              <Route path="/demo/chat" element={<Chat />} />
+              <Route path="/demo/accounts" element={<Accounts />} />
+              <Route path="/demo/accounts/:id" element={<Accounts />} />
+              <Route path="/demo/transactions" element={<Transactions />} />
+              <Route path="/demo/budgets" element={<Budgets />} />
+              <Route path="/demo/goals" element={<Goals />} />
+              <Route path="/demo/pulse" element={<Pulse />} />
+              <Route path="/demo/settings" element={<Settings />} />
+            </Route>
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
