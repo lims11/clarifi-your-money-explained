@@ -14,7 +14,346 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      accounts: {
+        Row: {
+          balance: number | null
+          colour: string | null
+          created_at: string | null
+          currency: string | null
+          icon: string | null
+          id: string
+          institution: string | null
+          is_active: boolean | null
+          name: string
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          colour?: string | null
+          created_at?: string | null
+          currency?: string | null
+          icon?: string | null
+          id?: string
+          institution?: string | null
+          is_active?: boolean | null
+          name: string
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          colour?: string | null
+          created_at?: string | null
+          currency?: string | null
+          icon?: string | null
+          id?: string
+          institution?: string | null
+          is_active?: boolean | null
+          name?: string
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      budgets: {
+        Row: {
+          amount: number
+          category: string
+          colour: string | null
+          created_at: string | null
+          id: string
+          name: string
+          period: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          colour?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          period: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          colour?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          period?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          colour: string | null
+          created_at: string | null
+          current_amount: number | null
+          icon: string | null
+          id: string
+          name: string
+          target_amount: number
+          target_date: string | null
+          user_id: string
+        }
+        Insert: {
+          colour?: string | null
+          created_at?: string | null
+          current_amount?: number | null
+          icon?: string | null
+          id?: string
+          name: string
+          target_amount: number
+          target_date?: string | null
+          user_id: string
+        }
+        Update: {
+          colour?: string | null
+          created_at?: string | null
+          current_amount?: number | null
+          icon?: string | null
+          id?: string
+          name?: string
+          target_amount?: number
+          target_date?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      onboarding_answers: {
+        Row: {
+          answer: Json
+          created_at: string | null
+          id: string
+          question_key: string
+          user_id: string
+        }
+        Insert: {
+          answer: Json
+          created_at?: string | null
+          id?: string
+          question_key: string
+          user_id: string
+        }
+        Update: {
+          answer?: Json
+          created_at?: string | null
+          id?: string
+          question_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          full_name: string | null
+          id: string
+          onboarding_complete: boolean | null
+          onboarding_step: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          full_name?: string | null
+          id: string
+          onboarding_complete?: boolean | null
+          onboarding_step?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          full_name?: string | null
+          id?: string
+          onboarding_complete?: boolean | null
+          onboarding_step?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      pulse_alerts: {
+        Row: {
+          action_label: string | null
+          body: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_label?: string | null
+          body: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          action_label?: string | null
+          body?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      scheduled_transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          category: string
+          created_at: string | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          name: string
+          next_date: string
+          payee: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          category: string
+          created_at?: string | null
+          frequency: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          next_date: string
+          payee?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          category?: string
+          created_at?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          next_date?: string
+          payee?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          account_id: string
+          ai_category_confidence: number | null
+          ai_category_reason: string | null
+          amount: number
+          category: string
+          created_at: string | null
+          date: string
+          description: string | null
+          id: string
+          is_cleared: boolean | null
+          is_recurring: boolean | null
+          payee: string | null
+          subcategory: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          ai_category_confidence?: number | null
+          ai_category_reason?: string | null
+          amount: number
+          category: string
+          created_at?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          is_cleared?: boolean | null
+          is_recurring?: boolean | null
+          payee?: string | null
+          subcategory?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          ai_category_confidence?: number | null
+          ai_category_reason?: string | null
+          amount?: number
+          category?: string
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          is_cleared?: boolean | null
+          is_recurring?: boolean | null
+          payee?: string | null
+          subcategory?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
