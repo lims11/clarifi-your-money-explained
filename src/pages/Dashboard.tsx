@@ -1,23 +1,18 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Bell, TrendingUp, TrendingDown, ArrowRight, Target, ArrowUpRight, ArrowDownRight, Sparkles, Heart } from 'lucide-react';
 import { formatCurrency, categoryIcons, categoryColours } from '@/lib/finance';
 import { useAccounts, useMonthTransactions, useBudgets, useGoals, usePulseAlerts, useScheduledTransactions, useUnreadAlertCount } from '@/hooks/useFinanceData';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
+import { netWorthHistory } from '@/data/sample-data';
 
 const DOUGHNUT_COLOURS: Record<string, string> = {
   'Food & Drink': '#D85A30', 'Groceries': '#1D9E75', 'Transport': '#EF9F27',
   'Bills': '#7F77DD', 'Shopping': '#378ADD', 'Entertainment': '#E24B4A',
-  'Clothing': '#7F77DD', 'Income': '#1D9E75',
+  'Clothing': '#7F77DD', 'Income': '#1D9E75', 'Health': '#1D9E75', 'Personal': '#888780',
 };
-
-const netWorthHistory = [
-  { month: 'Nov', value: 8200 }, { month: 'Dec', value: 8600 },
-  { month: 'Jan', value: 9100 }, { month: 'Feb', value: 9300 },
-  { month: 'Mar', value: 9500 }, { month: 'Apr', value: 0 },
-];
 
 export default function DashboardPage() {
   const { data: accounts, isLoading: loadingAccounts } = useAccounts();
