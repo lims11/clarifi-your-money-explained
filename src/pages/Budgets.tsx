@@ -1,22 +1,39 @@
-import { useState, useEffect } from 'react';
-import { Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Plus, MoreHorizontal, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, categoryIcons } from '@/lib/finance';
-import { useBudgets, useMonthTransactions, useAddBudget, useUpdateBudget, useDeleteBudget } from '@/hooks/useFinanceData';
+import { useBudgets, useTransactions, useAddBudget, useUpdateBudget, useDeleteBudget } from '@/hooks/useFinanceData';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 
 const CATEGORIES = ['Food & Drink', 'Transport', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Travel', 'Personal', 'Education'];
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const PIE_COLORS = [
+  'hsl(var(--primary))', '#1D9E75', '#EF9F27', '#D85A30', '#534AB7',
+  '#7F77DD', '#00AEEF', '#FF3464', '#117ACA', '#961A1A',
+];
+
+function getMonthRange(year: number, month: number) {
+  const start = new Date(year, month, 1).toISOString().split('T')[0];
+  const end = new Date(year, month + 1, 0).toISOString().split('T')[0];
+  return { start, end };
+}
 
 export default function BudgetsPage() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
   const { data: budgets, isLoading } = useBudgets();
-  const { data: transactions } = useMonthTransactions();
+  const { data: allTransactions } = useTransactions();
   const addBudget = useAddBudget();
   const updateBudget = useUpdateBudget();
   const deleteBudget = useDeleteBudget();
   const demo = useDemoMode();
+
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: '', category: 'Food & Drink', amount: '', period: 'monthly', colour: '#7F77DD' });
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
@@ -30,8 +47,31 @@ export default function BudgetsPage() {
     return () => document.removeEventListener('click', handleClick);
   }, []);
 
-  const spendByCategory = (transactions || []).filter(t => t.type === 'expense').reduce((acc, t) => {
+  const isCurrentMonth = selectedMonth === currentMonth;
+  const { start: monthStart, end: monthEnd } = getMonthRange(currentYear, selectedMonth);
+  const daysInMonth = new Date(currentYear, selectedMonth + 1, 0).getDate();
+  const dayOfMonth = isCurrentMonth ? now.getDate() : daysInMonth;
+  const daysLeft = isCurrentMonth ? daysInMonth - dayOfMonth : 0;
+
+  // Filter transactions for selected month
+  const monthTransactions = useMemo(() =>
+    (allTransactions || []).filter(t => t.date >= monthStart && t.date <= monthEnd),
+    [allTransactions, monthStart, monthEnd]
+  );
+
+  const incomeTransactions = monthTransactions.filter(t => t.type === 'income');
+  const expenseTransactions = monthTransactions.filter(t => t.type === 'expense');
+  const totalIncome = incomeTransactions.reduce((s, t) => s + Math.abs(Number(t.amount)), 0);
+  const totalExpenses = expenseTransactions.reduce((s, t) => s + Math.abs(Number(t.amount)), 0);
+
+  const spendByCategory = expenseTransactions.reduce((acc, t) => {
     acc[t.category] = (acc[t.category] || 0) + Math.abs(Number(t.amount));
+    return acc;
+  }, {} as Record<string, number>);
+
+  const incomeByCategory = incomeTransactions.reduce((acc, t) => {
+    const cat = t.subcategory || t.category || 'Other';
+    acc[cat] = (acc[cat] || 0) + Math.abs(Number(t.amount));
     return acc;
   }, {} as Record<string, number>);
 
@@ -41,48 +81,265 @@ export default function BudgetsPage() {
     return { ...b, spent, remaining: Number(b.amount) - spent, pct };
   });
 
+  const totalPlannedExpenses = budgetsWithSpend.reduce((s, b) => s + Number(b.amount), 0);
   const onTrack = budgetsWithSpend.filter(b => b.pct < 80).length;
   const overBudget = budgetsWithSpend.filter(b => b.pct >= 100).length;
-  const daysLeft = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() - new Date().getDate();
-  const chartData = budgetsWithSpend.map(b => ({ name: b.name, Budget: Number(b.amount), Spent: b.spent }));
 
-  if (isLoading) return <div className="p-5 lg:p-8 max-w-4xl mx-auto space-y-4"><Skeleton className="h-8 w-32" /><Skeleton className="h-48 rounded-2xl" /></div>;
+  // Savings
+  const savedAmount = totalIncome - totalExpenses;
+  const savingsPercent = totalIncome > 0 ? Math.round((savedAmount / totalIncome) * 100) : 0;
+
+  // Pie data for expenses
+  const expensePieData = Object.entries(spendByCategory).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+
+  // Month tabs (Jan → current month)
+  const months = MONTH_NAMES.slice(0, currentMonth + 1);
+
+  if (isLoading) return <div className="p-5 lg:p-8 max-w-5xl mx-auto space-y-4"><Skeleton className="h-8 w-32" /><Skeleton className="h-48 rounded-2xl" /></div>;
 
   return (
-    <div className="p-5 lg:p-8 max-w-4xl mx-auto">
+    <div className="p-5 lg:p-8 max-w-5xl mx-auto">
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-medium">Budgets</h1>
         <Button size="sm" onClick={() => setShowAdd(true)}><Plus size={16} /> Add budget</Button>
       </div>
 
+      {/* Summary cards */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="clarifi-card text-center"><p className="text-2xl font-medium text-teal">{onTrack}</p><p className="label-text mt-1">On track</p></div>
         <div className="clarifi-card text-center"><p className="text-2xl font-medium text-coral">{overBudget}</p><p className="label-text mt-1">Over budget</p></div>
-        <div className="clarifi-card text-center"><p className="text-2xl font-medium text-muted-foreground">{daysLeft}</p><p className="label-text mt-1">Days left</p></div>
+        <div className="clarifi-card text-center"><p className="text-2xl font-medium text-muted-foreground">{isCurrentMonth ? daysLeft : '—'}</p><p className="label-text mt-1">{isCurrentMonth ? 'Days left' : 'Completed'}</p></div>
       </div>
 
-      {chartData.length > 0 && (
+      {/* Month navigation */}
+      <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-1">
+        {months.map((m, i) => (
+          <button
+            key={m}
+            onClick={() => setSelectedMonth(i)}
+            className={`px-4 py-2 text-sm font-medium rounded-xl whitespace-nowrap transition-colors ${
+              selectedMonth === i
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+            }`}
+          >
+            {m}
+          </button>
+        ))}
+      </div>
+
+      {/* Monthly overview — Start/End Balance & Savings */}
+      <div className="grid md:grid-cols-2 gap-4 mb-6">
+        {/* Planned vs Actual bars */}
+        <div className="clarifi-card">
+          <h2 className="text-sm font-medium mb-4">
+            {MONTH_NAMES[selectedMonth]} — {isCurrentMonth ? 'Planned vs Actual' : 'Planned vs Spent'}
+          </h2>
+          <div className="grid grid-cols-2 gap-6">
+            {/* Expenses */}
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Expenses</p>
+              <div className="space-y-2">
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Planned</span>
+                    <span>{formatCurrency(totalPlannedExpenses)}</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-primary/30" style={{ width: '100%' }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">{isCurrentMonth ? 'Actual' : 'Spent'}</span>
+                    <span>{formatCurrency(totalExpenses)}</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-muted overflow-hidden">
+                    <div className={`h-full rounded-full ${totalExpenses > totalPlannedExpenses ? 'bg-coral' : 'bg-primary'}`}
+                      style={{ width: `${totalPlannedExpenses > 0 ? Math.min((totalExpenses / totalPlannedExpenses) * 100, 100) : 0}%` }} />
+                  </div>
+                </div>
+              </div>
+              {totalExpenses > totalPlannedExpenses && (
+                <p className="text-xs text-coral mt-2">Over by {formatCurrency(totalExpenses - totalPlannedExpenses)}</p>
+              )}
+            </div>
+            {/* Income */}
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Income</p>
+              <div className="space-y-2">
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Planned</span>
+                    <span>{formatCurrency(totalIncome)}</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-teal/30" style={{ width: '100%' }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">{isCurrentMonth ? 'Actual' : 'Received'}</span>
+                    <span>{formatCurrency(totalIncome)}</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-teal" style={{ width: '100%' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Savings card */}
+        <div className="clarifi-card flex flex-col items-center justify-center text-center">
+          <p className={`text-3xl font-bold ${savedAmount >= 0 ? 'text-teal' : 'text-coral'}`}>
+            {savedAmount >= 0 ? '+' : ''}{savingsPercent}%
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">{savedAmount >= 0 ? 'Increase in savings' : 'Overspent'}</p>
+          <div className="border-t border-dashed border-border my-3 w-2/3" />
+          <p className={`text-2xl font-bold ${savedAmount >= 0 ? 'text-teal' : 'text-coral'}`}>
+            {formatCurrency(Math.abs(savedAmount))}
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">{savedAmount >= 0 ? 'Saved this month' : 'Deficit this month'}</p>
+        </div>
+      </div>
+
+      {/* Side-by-side breakdown: Expenses & Income */}
+      <div className="grid md:grid-cols-2 gap-4 mb-6">
+        {/* Expenses breakdown */}
+        <div className="clarifi-card">
+          <h2 className="text-sm font-medium mb-3 text-coral">Expenses</h2>
+          <div className="border-b border-border pb-2 mb-2 flex justify-between text-xs text-muted-foreground font-medium">
+            <span>Category</span>
+            <div className="flex gap-6">
+              <span className="w-16 text-right">Planned</span>
+              <span className="w-16 text-right">{isCurrentMonth ? 'Actual' : 'Spent'}</span>
+              <span className="w-14 text-right">Diff.</span>
+            </div>
+          </div>
+          {budgetsWithSpend.length > 0 ? budgetsWithSpend.map(b => {
+            const diff = Number(b.amount) - b.spent;
+            return (
+              <div key={b.id} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0 text-sm">
+                <span className="flex items-center gap-2">
+                  <span className="text-base">{categoryIcons[b.category] || '📊'}</span>
+                  <span className="truncate max-w-[120px]">{b.category}</span>
+                </span>
+                <div className="flex gap-6">
+                  <span className="w-16 text-right text-muted-foreground">{formatCurrency(Number(b.amount))}</span>
+                  <span className="w-16 text-right">{formatCurrency(b.spent)}</span>
+                  <span className={`w-14 text-right font-medium ${diff >= 0 ? 'text-teal' : 'text-coral'}`}>
+                    {diff >= 0 ? '' : '-'}{formatCurrency(Math.abs(diff))}
+                  </span>
+                </div>
+              </div>
+            );
+          }) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">No budgets set</p>
+          )}
+          <div className="flex justify-between items-center pt-3 mt-2 border-t border-border text-sm font-medium">
+            <span>Total</span>
+            <div className="flex gap-6">
+              <span className="w-16 text-right">{formatCurrency(totalPlannedExpenses)}</span>
+              <span className="w-16 text-right">{formatCurrency(totalExpenses)}</span>
+              <span className={`w-14 text-right ${totalPlannedExpenses - totalExpenses >= 0 ? 'text-teal' : 'text-coral'}`}>
+                {totalPlannedExpenses - totalExpenses >= 0 ? '' : '-'}{formatCurrency(Math.abs(totalPlannedExpenses - totalExpenses))}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Income breakdown */}
+        <div className="clarifi-card">
+          <h2 className="text-sm font-medium mb-3 text-teal">Income</h2>
+          <div className="border-b border-border pb-2 mb-2 flex justify-between text-xs text-muted-foreground font-medium">
+            <span>Source</span>
+            <div className="flex gap-6">
+              <span className="w-16 text-right">Planned</span>
+              <span className="w-16 text-right">{isCurrentMonth ? 'Actual' : 'Received'}</span>
+              <span className="w-14 text-right">Diff.</span>
+            </div>
+          </div>
+          {Object.entries(incomeByCategory).length > 0 ? Object.entries(incomeByCategory).map(([cat, amount]) => (
+            <div key={cat} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0 text-sm">
+              <span className="flex items-center gap-2">
+                <span className="text-base">💰</span>
+                <span className="truncate max-w-[120px]">{cat}</span>
+              </span>
+              <div className="flex gap-6">
+                <span className="w-16 text-right text-muted-foreground">{formatCurrency(amount)}</span>
+                <span className="w-16 text-right">{formatCurrency(amount)}</span>
+                <span className="w-14 text-right text-teal">{formatCurrency(0)}</span>
+              </div>
+            </div>
+          )) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">No income recorded</p>
+          )}
+          <div className="flex justify-between items-center pt-3 mt-2 border-t border-border text-sm font-medium">
+            <span>Total</span>
+            <div className="flex gap-6">
+              <span className="w-16 text-right">{formatCurrency(totalIncome)}</span>
+              <span className="w-16 text-right">{formatCurrency(totalIncome)}</span>
+              <span className="w-14 text-right text-teal">{formatCurrency(0)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Expense donut chart */}
+      {expensePieData.length > 0 && (
         <div className="clarifi-card mb-6">
-          <h2 className="text-sm font-medium mb-4">Budget vs Spent</h2>
-          <div className="h-48"><ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" /><XAxis dataKey="name" tick={{ fontSize: 11 }} /><YAxis tickFormatter={v => `£${v}`} tick={{ fontSize: 11 }} /><Tooltip formatter={(v: number) => formatCurrency(v)} /><Bar dataKey="Budget" fill="#7F77DD" opacity={0.3} radius={[4,4,0,0]} /><Bar dataKey="Spent" fill="#7F77DD" radius={[4,4,0,0]} /></BarChart>
-          </ResponsiveContainer></div>
+          <h2 className="text-sm font-medium mb-4">{MONTH_NAMES[selectedMonth]} Spending Breakdown</h2>
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="h-52 w-52 flex-shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={expensePieData} dataKey="value" innerRadius={50} outerRadius={90} paddingAngle={2}>
+                    {expensePieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2">
+              {expensePieData.map((d, i) => (
+                <div key={d.name} className="flex items-center gap-2 text-sm">
+                  <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
+                  <span className="truncate flex-1">{d.name}</span>
+                  <span className="font-medium">{formatCurrency(d.value)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-between mt-4 pt-3 border-t border-border">
+            <div>
+              <p className="text-xs text-muted-foreground">Monthly income</p>
+              <p className="text-lg font-bold text-teal">{formatCurrency(totalIncome)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">Savings amount</p>
+              <p className={`text-lg font-bold ${savedAmount >= 0 ? 'text-teal' : 'text-coral'}`}>{formatCurrency(savedAmount)}</p>
+            </div>
+          </div>
         </div>
       )}
 
+      {/* Budget cards */}
       {budgetsWithSpend.length === 0 ? (
         <div className="clarifi-card text-center py-12"><p className="text-lg font-medium mb-2">No budgets yet</p><p className="text-sm text-muted-foreground mb-4">Create your first budget to track spending</p><Button onClick={() => setShowAdd(true)}>Add budget</Button></div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {budgetsWithSpend.map(b => {
             const barColor = b.pct >= 100 ? 'bg-coral' : b.pct >= 80 ? 'bg-amber' : b.pct >= 50 ? 'bg-primary' : 'bg-teal';
-            const projected = daysLeft > 0 ? (b.spent / (new Date().getDate())) * new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() : b.spent;
+            const projected = daysLeft > 0 ? (b.spent / Math.max(1, dayOfMonth)) * daysInMonth : b.spent;
             return (
               <div key={b.id} className="clarifi-card">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-lg">{categoryIcons[b.category] || '📊'}</span>
                   <h3 className="text-sm font-medium flex-1">{b.name}</h3>
-                  <span className="text-xs text-muted-foreground">{daysLeft}d left</span>
+                  {isCurrentMonth && <span className="text-xs text-muted-foreground">{daysLeft}d left</span>}
                   <div className="relative">
                     <button onClick={(e) => { e.stopPropagation(); setMenuOpen(menuOpen === b.id ? null : b.id); }} className="p-1 rounded-lg hover:bg-muted transition-colors text-muted-foreground">
                       <MoreHorizontal size={16} />
@@ -108,11 +365,15 @@ export default function BudgetsPage() {
                   <span className="text-muted-foreground">{formatCurrency(b.spent)} of {formatCurrency(Number(b.amount))}</span>
                   <span className={b.pct >= 100 ? 'amount-negative' : 'text-muted-foreground'}>{b.pct}%</span>
                 </div>
-                <div className="flex justify-between text-xs text-muted-foreground mb-2">
-                  <span>Avg: {formatCurrency(b.spent / Math.max(1, new Date().getDate()))}/day</span>
-                  <span>Projected: {formatCurrency(projected)}</span>
-                </div>
-                <p className="text-xs text-primary">{b.pct < 50 ? "You're on track — keep it up!" : b.pct < 80 ? `${formatCurrency(b.remaining)} left for the rest of the month.` : b.pct >= 100 ? `Over budget by ${formatCurrency(Math.abs(b.remaining))}` : `⚠ Tracking to overspend by ${formatCurrency(projected - Number(b.amount))}`}</p>
+                {isCurrentMonth && (
+                  <>
+                    <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                      <span>Avg: {formatCurrency(b.spent / Math.max(1, dayOfMonth))}/day</span>
+                      <span>Projected: {formatCurrency(projected)}</span>
+                    </div>
+                    <p className="text-xs text-primary">{b.pct < 50 ? "You're on track — keep it up!" : b.pct < 80 ? `${formatCurrency(b.remaining)} left for the rest of the month.` : b.pct >= 100 ? `Over budget by ${formatCurrency(Math.abs(b.remaining))}` : `⚠ Tracking to overspend by ${formatCurrency(projected - Number(b.amount))}`}</p>
+                  </>
+                )}
               </div>
             );
           })}
