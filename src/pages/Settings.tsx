@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryClient } from '@tanstack/react-query';
-import { Database, RefreshCw, Trash2 } from 'lucide-react';
+import { Database, RefreshCw, Trash2, ChevronRight, Tag, Users, Globe, Archive, Shield, Bell as BellIcon, Search, FileText, List, Palette } from 'lucide-react';
 
 const institutionLogos: Record<string, { bg: string; letter: string }> = {
   'Barclays': { bg: '#00AEEF', letter: 'B' },
