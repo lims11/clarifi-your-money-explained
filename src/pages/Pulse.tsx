@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, Lightbulb, TrendingUp, CheckCircle2, MessageSquare } from 'lucide-react';
+import { AlertTriangle, Lightbulb, TrendingUp, CheckCircle2, MessageSquare, Bell } from 'lucide-react';
 import { usePulseAlerts, useMarkAlertRead, useMarkAllAlertsRead } from '@/hooks/useFinanceData';
 import { formatRelativeTime } from '@/lib/finance';
 import { Button } from '@/components/ui/button';
