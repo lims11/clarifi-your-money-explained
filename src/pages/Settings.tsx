@@ -105,7 +105,114 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Preferences */}
       <div className="clarifi-card">
+        <h2 className="text-sm font-medium mb-4">Preferences</h2>
+        <div className="divide-y">
+          {[
+            { icon: Tag, label: 'Categories', desc: 'Manage transaction categories', color: '#7F77DD' },
+            { icon: Users, label: 'Payees', desc: 'Saved payee names & rules', color: '#378ADD' },
+            { icon: Palette, label: 'Tags', desc: 'Custom tags for transactions', color: '#E24B4A' },
+            { icon: Globe, label: 'Currencies', desc: 'Display & conversion settings', color: '#1D9E75' },
+            { icon: Archive, label: 'Archived Accounts', desc: 'View hidden accounts', color: '#6B7280' },
+          ].map(item => (
+            <button key={item.label} className="flex items-center gap-3 w-full py-3 text-left hover:bg-muted/50 rounded-lg px-2 transition-colors">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: item.color + '18', color: item.color }}>
+                <item.icon size={14} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">{item.label}</p>
+                <p className="text-[11px] text-muted-foreground">{item.desc}</p>
+              </div>
+              <ChevronRight size={14} className="text-muted-foreground" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Security & Privacy */}
+      <div className="clarifi-card">
+        <h2 className="text-sm font-medium mb-4">Security</h2>
+        <div className="divide-y">
+          {[
+            { icon: Shield, label: 'Security', desc: 'Password, 2FA & login history' },
+            { icon: Search, label: 'Spotlight indexing', desc: 'Search transactions from device', toggle: true },
+          ].map(item => (
+            <div key={item.label} className="flex items-center gap-3 py-3 px-2">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-teal/10 text-teal">
+                <item.icon size={14} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">{item.label}</p>
+                <p className="text-[11px] text-muted-foreground">{item.desc}</p>
+              </div>
+              {item.toggle ? (
+                <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-border text-primary focus:ring-primary" />
+              ) : (
+                <ChevronRight size={14} className="text-muted-foreground" />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Display */}
+      <div className="clarifi-card">
+        <h2 className="text-sm font-medium mb-4">Display</h2>
+        <div className="divide-y">
+          <div className="flex items-center gap-3 py-3 px-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
+              <FileText size={14} />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">New Transaction Screen</p>
+              <p className="text-[11px] text-muted-foreground">Configure the add transaction form</p>
+            </div>
+            <ChevronRight size={14} className="text-muted-foreground" />
+          </div>
+          <div className="flex items-center gap-3 py-3 px-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
+              <List size={14} />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">List of Transactions</p>
+              <p className="text-[11px] text-muted-foreground">Customize the transaction list layout</p>
+            </div>
+            <ChevronRight size={14} className="text-muted-foreground" />
+          </div>
+          <div className="flex items-center gap-3 py-3 px-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber/10 text-amber">
+              <Palette size={14} />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">Theme</p>
+            </div>
+            <div className="flex gap-1">
+              {['🌐', '☀️', '🌙'].map((emoji, i) => (
+                <button key={i} className={`w-8 h-8 rounded-lg text-sm flex items-center justify-center border ${i === 2 ? 'border-primary bg-primary/10' : 'border-border'}`}>
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-3 py-3 px-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-coral/10 text-coral">
+              <FileText size={14} />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">Font Size</p>
+            </div>
+            <div className="flex gap-1">
+              {['Aa', 'Aa', 'Aa'].map((label, i) => (
+                <button key={i} className={`px-3 py-1.5 rounded-lg border text-xs ${i === 1 ? 'border-primary bg-primary/10 font-medium' : 'border-border'}`}
+                  style={{ fontSize: i === 0 ? '11px' : i === 1 ? '13px' : '15px' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
         <h2 className="text-sm font-medium mb-4">Subscription</h2>
         <div className="flex items-center gap-3">
           <span className="text-xs px-2 py-1 bg-muted rounded-lg font-medium">Free plan</span>

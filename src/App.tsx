@@ -18,6 +18,7 @@ import Budgets from "./pages/Budgets";
 import Goals from "./pages/Goals";
 import Pulse from "./pages/Pulse";
 import Settings from "./pages/Settings";
+import Scheduled from "./pages/Scheduled";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/budgets" element={<Budgets />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/pulse" element={<Pulse />} />
+              <Route path="/scheduled" element={<Scheduled />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
 
@@ -58,6 +60,7 @@ const App = () => (
               <Route path="/demo/budgets" element={<Budgets />} />
               <Route path="/demo/goals" element={<Goals />} />
               <Route path="/demo/pulse" element={<Pulse />} />
+              <Route path="/demo/scheduled" element={<Scheduled />} />
               <Route path="/demo/settings" element={<Settings />} />
             </Route>
 
