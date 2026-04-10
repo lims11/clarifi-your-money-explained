@@ -8,6 +8,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
 import { netWorthHistory } from '@/data/sample-data';
 
+const DOUGHNUT_COLOURS: Record<string, string> = {
+  'Food & Drink': '#D85A30', 'Groceries': '#1D9E75', 'Transport': '#EF9F27',
+  'Bills': '#7F77DD', 'Shopping': '#378ADD', 'Entertainment': '#E24B4A',
+  'Clothing': '#7F77DD', 'Income': '#1D9E75', 'Health': '#1D9E75', 'Personal': '#888780',
+};
+
 export default function DashboardPage() {
   const { data: accounts, isLoading: loadingAccounts } = useAccounts();
   const { data: transactions, isLoading: loadingTxns } = useMonthTransactions();
