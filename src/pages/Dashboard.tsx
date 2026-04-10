@@ -1,12 +1,14 @@
-import { useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Bell, TrendingUp, TrendingDown, ArrowRight, Target, ArrowUpRight, ArrowDownRight, Sparkles, Heart } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Bell, TrendingUp, TrendingDown, ArrowRight, Target, ArrowUpRight, ArrowDownRight, Sparkles } from 'lucide-react';
 import { formatCurrency, categoryIcons, categoryColours } from '@/lib/finance';
 import { useAccounts, useMonthTransactions, useBudgets, useGoals, usePulseAlerts, useScheduledTransactions, useUnreadAlertCount } from '@/hooks/useFinanceData';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
-import { netWorthHistory } from '@/data/sample-data';
+import { netWorthHistory, sampleCreditScore } from '@/data/sample-data';
+import { CreditScoreWidget } from '@/components/CreditScoreWidget';
+import { FinancialHealthScore } from '@/components/FinancialHealthScore';
 
 const DOUGHNUT_COLOURS: Record<string, string> = {
   'Food & Drink': '#D85A30', 'Groceries': '#1D9E75', 'Transport': '#EF9F27',
@@ -15,6 +17,7 @@ const DOUGHNUT_COLOURS: Record<string, string> = {
 };
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const { data: accounts, isLoading: loadingAccounts } = useAccounts();
   const { data: transactions, isLoading: loadingTxns } = useMonthTransactions();
   const { data: budgets } = useBudgets();
@@ -49,7 +52,6 @@ export default function DashboardPage() {
     return { totalAssets, totalLiabilities, netWorth, income, expenses, savingsRate, totalBudget, categoryData };
   }, [accounts, transactions, budgets]);
 
-  // Update the last net worth history point dynamically
   const chartData = useMemo(() => {
     if (!stats) return netWorthHistory;
     const d = [...netWorthHistory];
@@ -60,28 +62,35 @@ export default function DashboardPage() {
   const topGoal = goals?.[0];
   const topGoalPct = topGoal ? Math.round((Number(topGoal.current_amount) / Number(topGoal.target_amount)) * 100) : 0;
 
-  // Health score
-  const healthScore = useMemo(() => {
-    if (!stats || !budgets || !goals || !accounts) return 0;
-    let score = 0;
-    // Savings rate (25pts)
-    score += Math.min(25, Math.round((stats.savingsRate / 20) * 25));
-    // Budget adherence (25pts)
+  // Health score factors
+  const healthFactors = useMemo(() => {
+    if (!stats || !budgets || !goals || !accounts) return [];
+    const savingsRateScore = Math.min(25, Math.round((stats.savingsRate / 20) * 25));
     const budgetsOnTrack = budgets.filter(b => {
       const spent = stats.categoryData.find(c => c.name === b.category)?.value ?? 0;
       return spent <= Number(b.amount);
     }).length;
-    score += budgets.length > 0 ? Math.round((budgetsOnTrack / budgets.length) * 25) : 25;
-    // Debt ratio (25pts)
+    const budgetScore = budgets.length > 0 ? Math.round((budgetsOnTrack / budgets.length) * 25) : 25;
     const debtRatio = stats.totalAssets > 0 ? stats.totalLiabilities / stats.totalAssets : 1;
-    score += Math.max(0, Math.round((1 - debtRatio) * 25));
-    // Emergency fund (25pts)
-    if (topGoal) score += Math.min(25, Math.round(topGoalPct / 4));
-    return Math.min(100, score);
+    const debtScore = Math.max(0, Math.round((1 - debtRatio) * 25));
+    const efScore = topGoal ? Math.min(25, Math.round(topGoalPct / 4)) : 0;
+
+    return [
+      { name: 'Savings rate', description: `You save ${stats.savingsRate.toFixed(0)}% of income`, score: savingsRateScore, maxScore: 25, colour: savingsRateScore >= 20 ? '#1D9E75' : '#EF9F27', tip: savingsRateScore < 20 ? 'Aim for 20%+ savings rate for full marks.' : null },
+      { name: 'Budget adherence', description: `${budgetsOnTrack} of ${budgets.length} budgets on track`, score: budgetScore, maxScore: 25, colour: budgetScore >= 20 ? '#1D9E75' : '#EF9F27', tip: budgetScore < 20 ? 'Reducing overspent budgets adds up to 9 points.' : null },
+      { name: 'Debt ratio', description: `Liabilities are ${(debtRatio * 100).toFixed(0)}% of total assets`, score: debtScore, maxScore: 25, colour: debtScore >= 20 ? '#1D9E75' : '#EF9F27', tip: null },
+      { name: 'Emergency fund', description: `Emergency fund is ${topGoalPct}% complete`, score: efScore, maxScore: 25, colour: efScore >= 20 ? '#1D9E75' : '#EF9F27', tip: efScore < 25 ? `£${(Number(topGoal?.target_amount ?? 0) - Number(topGoal?.current_amount ?? 0)).toLocaleString()} more will give you a perfect score.` : null },
+    ];
   }, [stats, budgets, goals, accounts, topGoalPct, topGoal]);
 
-  const healthColor = healthScore >= 75 ? 'text-teal' : healthScore >= 50 ? 'text-amber' : 'text-coral';
-  const healthBg = healthScore >= 75 ? 'bg-teal' : healthScore >= 50 ? 'bg-amber' : 'bg-coral';
+  const healthScore = healthFactors.reduce((s, f) => s + f.score, 0);
+
+  const pulseTypeConfig: Record<string, { border: string }> = {
+    warning: { border: 'border-l-amber' },
+    insight: { border: 'border-l-primary' },
+    tip: { border: 'border-l-teal' },
+    success: { border: 'border-l-teal' },
+  };
 
   if (loadingAccounts || loadingTxns) {
     return (
@@ -99,13 +108,6 @@ export default function DashboardPage() {
   if (!stats) return null;
 
   const totalSpent = stats.categoryData.reduce((s, c) => s + c.value, 0);
-
-  const pulseTypeConfig: Record<string, { border: string }> = {
-    warning: { border: 'border-l-amber' },
-    insight: { border: 'border-l-primary' },
-    tip: { border: 'border-l-teal' },
-    success: { border: 'border-l-teal' },
-  };
 
   return (
     <div className="p-5 lg:p-8 max-w-6xl mx-auto space-y-6">
@@ -152,21 +154,10 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Health score */}
-      <div className="clarifi-card flex items-center gap-4">
-        <div className="flex items-center gap-3 flex-1">
-          <Heart size={20} className={healthColor} />
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-sm font-medium">Financial health score</span>
-              <span className={`text-lg font-medium ${healthColor}`}>{healthScore}/100</span>
-            </div>
-            <div className="h-2 rounded-full bg-muted overflow-hidden">
-              <div className={`h-full rounded-full transition-all ${healthBg}`} style={{ width: `${healthScore}%` }} />
-            </div>
-          </div>
-        </div>
-        <Link to="/chat?q=What+affects+my+score?" className="text-xs text-primary hover:underline whitespace-nowrap">What affects my score?</Link>
+      {/* Health score + Credit score */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        <FinancialHealthScore totalScore={healthScore} factors={healthFactors} />
+        <CreditScoreWidget data={sampleCreditScore} />
       </div>
 
       {/* Chat bar */}
@@ -180,35 +171,12 @@ export default function DashboardPage() {
 
       {/* Stats row - 6 cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-        <div className="clarifi-card">
-          <p className="label-text mb-1">Income</p>
-          <p className="text-lg font-medium amount-positive">{formatCurrency(stats.income)}</p>
-        </div>
-        <div className="clarifi-card">
-          <p className="label-text mb-1">Expenses</p>
-          <p className="text-lg font-medium amount-negative">{formatCurrency(stats.expenses)}</p>
-        </div>
-        <div className="clarifi-card">
-          <p className="label-text mb-1">Budget left</p>
-          <p className="text-lg font-medium text-primary">{formatCurrency(stats.totalBudget - stats.expenses)}</p>
-        </div>
-        <div className="clarifi-card">
-          <p className="label-text mb-1">Savings goal</p>
-          <p className="text-lg font-medium text-teal">{topGoalPct}%</p>
-        </div>
-        <div className="clarifi-card">
-          <p className="label-text mb-1">Savings rate</p>
-          <p className={`text-lg font-medium ${stats.savingsRate >= 20 ? 'text-teal' : stats.savingsRate >= 10 ? 'text-amber' : 'text-coral'}`}>
-            {stats.savingsRate.toFixed(0)}%
-          </p>
-        </div>
-        <div className="clarifi-card">
-          <p className="label-text mb-1">Net change</p>
-          <p className={`text-lg font-medium flex items-center gap-1 ${stats.income - stats.expenses >= 0 ? 'amount-positive' : 'amount-negative'}`}>
-            {stats.income - stats.expenses >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-            {formatCurrency(Math.abs(stats.income - stats.expenses))}
-          </p>
-        </div>
+        <div className="clarifi-card"><p className="label-text mb-1">Income</p><p className="text-lg font-medium amount-positive">{formatCurrency(stats.income)}</p></div>
+        <div className="clarifi-card"><p className="label-text mb-1">Expenses</p><p className="text-lg font-medium amount-negative">{formatCurrency(stats.expenses)}</p></div>
+        <div className="clarifi-card"><p className="label-text mb-1">Budget left</p><p className="text-lg font-medium text-primary">{formatCurrency(stats.totalBudget - stats.expenses)}</p></div>
+        <div className="clarifi-card"><p className="label-text mb-1">Savings goal</p><p className="text-lg font-medium text-teal">{topGoalPct}%</p></div>
+        <div className="clarifi-card"><p className="label-text mb-1">Savings rate</p><p className={`text-lg font-medium ${stats.savingsRate >= 20 ? 'text-teal' : stats.savingsRate >= 10 ? 'text-amber' : 'text-coral'}`}>{stats.savingsRate.toFixed(0)}%</p></div>
+        <div className="clarifi-card"><p className="label-text mb-1">Net change</p><p className={`text-lg font-medium flex items-center gap-1 ${stats.income - stats.expenses >= 0 ? 'amount-positive' : 'amount-negative'}`}>{stats.income - stats.expenses >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}{formatCurrency(Math.abs(stats.income - stats.expenses))}</p></div>
       </div>
 
       {/* Two column */}
@@ -289,7 +257,7 @@ export default function DashboardPage() {
             {alerts && alerts.length > 0 ? (
               <div className="space-y-3">
                 {alerts.slice(0, 3).map(a => (
-                  <div key={a.id} className={`p-3 rounded-xl border border-l-4 ${pulseTypeConfig[a.type]?.border || 'border-l-primary'} ${!a.is_read ? 'bg-primary-light/30' : ''}`}>
+                  <div key={a.id} onClick={() => navigate('/pulse')} className={`p-3 rounded-xl border border-l-4 cursor-pointer hover:bg-muted/30 transition-colors ${pulseTypeConfig[a.type]?.border || 'border-l-primary'} ${!a.is_read ? 'bg-primary-light/30' : ''}`}>
                     <p className="label-text mb-0.5">{a.type}</p>
                     <p className="text-sm font-medium leading-snug">{a.title}</p>
                   </div>

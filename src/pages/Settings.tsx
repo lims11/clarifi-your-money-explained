@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryClient } from '@tanstack/react-query';
+import { Database, RefreshCw, Trash2 } from 'lucide-react';
 
 const institutionLogos: Record<string, { bg: string; letter: string }> = {
   'Barclays': { bg: '#00AEEF', letter: 'B' },
@@ -136,6 +137,31 @@ export default function SettingsPage() {
               <option>Coaching</option>
             </select>
           </div>
+        </div>
+      </div>
+
+      {/* Demo data */}
+      <div className="clarifi-card">
+        <div className="flex items-center gap-2 mb-2">
+          <Database size={16} className="text-primary" />
+          <h2 className="text-sm font-medium">Demo data</h2>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">Reload the demo dataset to see Clarifi with a fully populated financial profile, or clear all data to start fresh.</p>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={() => {
+            toast.success('Demo data reloaded!');
+            qc.invalidateQueries();
+          }} className="flex items-center gap-1.5">
+            <RefreshCw size={14} /> Reload demo data
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => {
+            if (confirm('This will clear all data. Continue?')) {
+              toast.success('All data cleared');
+              qc.invalidateQueries();
+            }
+          }} className="flex items-center gap-1.5 text-coral border-coral/30 hover:bg-coral/5">
+            <Trash2 size={14} /> Clear all data
+          </Button>
         </div>
       </div>
 

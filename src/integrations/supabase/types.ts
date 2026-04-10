@@ -116,6 +116,42 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_scores: {
+        Row: {
+          created_at: string | null
+          factors: Json | null
+          id: string
+          last_updated: string | null
+          previous_score: number | null
+          provider: string | null
+          rating: string | null
+          score: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          factors?: Json | null
+          id?: string
+          last_updated?: string | null
+          previous_score?: number | null
+          provider?: string | null
+          rating?: string | null
+          score?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          factors?: Json | null
+          id?: string
+          last_updated?: string | null
+          previous_score?: number | null
+          provider?: string | null
+          rating?: string | null
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           colour: string | null
@@ -148,6 +184,36 @@ export type Database = {
           name?: string
           target_amount?: number
           target_date?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      net_worth_history: {
+        Row: {
+          assets: number | null
+          created_at: string | null
+          date: string
+          id: string
+          liabilities: number | null
+          net_worth: number
+          user_id: string
+        }
+        Insert: {
+          assets?: number | null
+          created_at?: string | null
+          date: string
+          id?: string
+          liabilities?: number | null
+          net_worth: number
+          user_id: string
+        }
+        Update: {
+          assets?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          liabilities?: number | null
+          net_worth?: number
           user_id?: string
         }
         Relationships: []
