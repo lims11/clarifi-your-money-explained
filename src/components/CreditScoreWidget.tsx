@@ -114,19 +114,102 @@ export function CreditScoreWidget({ data }: { data: CreditScoreData }) {
       </button>
 
       {expanded && (
-        <div className="mt-3 space-y-3">
-          {factors.map((f, i) => (
-            <div key={i} className="flex gap-3 items-start">
-              <div className="w-1 h-full min-h-[36px] rounded-full flex-shrink-0" style={{ backgroundColor: impactColours[f.impact] || '#888780' }} />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium">{f.factor}</span>
-                  <span className="text-[10px] text-muted-foreground">{f.weight}% of score</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">{f.detail}</p>
+        <div className="mt-4 space-y-6">
+          <div>
+            <p className="text-xs text-muted-foreground mb-4">These are the things that are impacting your score the most</p>
+          </div>
+
+          {/* Action Needed */}
+          {factors.filter(f => f.impact === 'warning' || f.impact === 'negative').length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold">Action Needed</h4>
+                <span className="text-xs text-primary font-medium">
+                  {factors.filter(f => f.impact === 'warning' || f.impact === 'negative').length} topics
+                </span>
+              </div>
+              <div className="space-y-2.5">
+                {factors.filter(f => f.impact === 'warning' || f.impact === 'negative').map((f, i) => (
+                  <div key={i} className="rounded-2xl border bg-card p-4 shadow-sm">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className="w-4 h-4 rounded-full border-2 flex items-center justify-center" style={{ borderColor: impactColours[f.impact] }}>
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: impactColours[f.impact] }} />
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-medium">High impact</span>
+                    </div>
+                    <p className="text-sm font-semibold">{f.factor}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{f.detail}</p>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+          )}
+
+          {/* Monitor */}
+          {factors.filter(f => f.impact === 'neutral').length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold">Monitor</h4>
+                <span className="text-xs text-primary font-medium">
+                  {factors.filter(f => f.impact === 'neutral').length} topics
+                </span>
+              </div>
+              <div className="space-y-2.5">
+                {factors.filter(f => f.impact === 'neutral').map((f, i) => (
+                  <div key={i} className="rounded-2xl border bg-card p-4 shadow-sm">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className="w-4 h-4 rounded-full border-2 border-muted-foreground flex items-center justify-center">
+                        <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-medium">Medium impact</span>
+                    </div>
+                    <p className="text-sm font-semibold">{f.factor}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{f.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Doing Well */}
+          {factors.filter(f => f.impact === 'positive').length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold">Doing well</h4>
+                <span className="text-xs text-primary font-medium">
+                  {factors.filter(f => f.impact === 'positive').length} topics
+                </span>
+              </div>
+              <div className="space-y-2.5">
+                {factors.filter(f => f.impact === 'positive').map((f, i) => (
+                  <div key={i} className="rounded-2xl p-4 relative overflow-hidden" style={{ backgroundColor: 'hsl(var(--primary) / 0.15)' }}>
+                    {/* Confetti decoration */}
+                    <div className="absolute top-0 right-0 w-20 h-20 opacity-30 pointer-events-none">
+                      <svg viewBox="0 0 80 80" className="w-full h-full">
+                        {[...Array(12)].map((_, j) => (
+                          <g key={j}>
+                            <circle cx={15 + (j % 4) * 18} cy={10 + Math.floor(j / 4) * 22} r={2} fill={['#E24B4A', '#1D9E75', '#EF9F27', '#7F77DD', '#378ADD', '#FF3464'][j % 6]} />
+                            <path d={`M${20 + (j % 3) * 20},${15 + Math.floor(j / 3) * 18} q5,-8 2,5`} stroke={['#E24B4A', '#1D9E75', '#EF9F27', '#7F77DD'][j % 4]} strokeWidth={1.5} fill="none" />
+                          </g>
+                        ))}
+                      </svg>
+                    </div>
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className="w-4 h-4 rounded-full border-2 border-muted-foreground/50 flex items-center justify-center">
+                        <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-medium">
+                        {f.weight >= 20 ? 'Medium' : 'Low'} impact
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold">{f.factor}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{f.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <p className="text-[10px] text-muted-foreground text-center pt-1">Scores are simulated for demo purposes · Not regulated financial advice</p>
         </div>
       )}
