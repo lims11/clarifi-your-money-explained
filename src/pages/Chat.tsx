@@ -133,7 +133,7 @@ export default function ChatPage() {
                         : 'clarifi-card'
                     }`}>
                       {m.role === 'assistant' ? (
-                        <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">{m.content}</ReactMarkdown>
+                        <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{m.content}</ReactMarkdown></div>
                       ) : m.content}
                     </div>
                   </div>
@@ -155,7 +155,7 @@ export default function ChatPage() {
                       : 'clarifi-card'
                   }`}>
                     {m.role === 'assistant' ? (
-                      <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">{m.content}</ReactMarkdown>
+                      <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{m.content}</ReactMarkdown></div>
                     ) : m.content}
                     {m.role === 'assistant' && (
                       <button
