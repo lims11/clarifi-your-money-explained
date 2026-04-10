@@ -213,6 +213,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      <div className="clarifi-card">
         <h2 className="text-sm font-medium mb-4">Subscription</h2>
         <div className="flex items-center gap-3">
           <span className="text-xs px-2 py-1 bg-muted rounded-lg font-medium">Free plan</span>
