@@ -17,6 +17,11 @@ const makeTimestamp = (daysAgo: number, hours = 12) => {
   d.setHours(hours, 0, 0, 0);
   return d.toISOString();
 };
+const monthsAgoDate = (months: number) => {
+  const d = new Date(today);
+  d.setMonth(d.getMonth() - months);
+  return d.toISOString().split('T')[0];
+};
 
 export const sampleAccounts = [
   { id: 'acc-1', user_id: 'demo', name: 'Barclays Current', type: 'current', balance: 2847.50, currency: 'GBP', institution: 'Barclays', colour: '#00AEEF', icon: 'bank', is_active: true, created_at: makeTimestamp(90), updated_at: makeTimestamp(0) },
@@ -30,7 +35,6 @@ export const sampleAccounts = [
 ];
 
 export const sampleTransactions = [
-  // This month - various categories
   { id: 'txn-01', user_id: 'demo', account_id: 'acc-1', amount: 3200.00, type: 'income', category: 'Income', subcategory: 'Salary', payee: 'Employer Salary', date: makeDate(9), is_recurring: true, is_cleared: true, created_at: makeTimestamp(9), description: null, ai_category_confidence: null, ai_category_reason: null },
   { id: 'txn-02', user_id: 'demo', account_id: 'acc-1', amount: -1200.00, type: 'expense', category: 'Bills', subcategory: 'Rent/Mortgage', payee: 'Landlord Direct Debit', date: makeDate(8), is_recurring: true, is_cleared: true, created_at: makeTimestamp(8), description: null, ai_category_confidence: 0.98, ai_category_reason: 'Matched to recurring rent payment' },
   { id: 'txn-03', user_id: 'demo', account_id: 'acc-1', amount: -142.00, type: 'expense', category: 'Bills', subcategory: 'Energy', payee: 'EDF Energy', date: makeDate(8), is_recurring: true, is_cleared: true, created_at: makeTimestamp(8), description: null, ai_category_confidence: 0.96, ai_category_reason: 'Energy provider identified' },
@@ -64,7 +68,7 @@ export const sampleBudgets = [
   { id: 'bud-3', user_id: 'demo', name: 'Transport', category: 'Transport', amount: 150, period: 'monthly', colour: '#EF9F27', created_at: makeTimestamp(60) },
   { id: 'bud-4', user_id: 'demo', name: 'Shopping', category: 'Shopping', amount: 250, period: 'monthly', colour: '#378ADD', created_at: makeTimestamp(60) },
   { id: 'bud-5', user_id: 'demo', name: 'Entertainment', category: 'Entertainment', amount: 80, period: 'monthly', colour: '#7F77DD', created_at: makeTimestamp(60) },
-  { id: 'bud-6', user_id: 'demo', name: 'Bills', category: 'Bills', amount: 1700, period: 'monthly', colour: '#E24B4A', created_at: makeTimestamp(60) },
+  { id: 'bud-6', user_id: 'demo', name: 'Bills & Utilities', category: 'Bills', amount: 1800, period: 'monthly', colour: '#E24B4A', created_at: makeTimestamp(60) },
 ];
 
 export const sampleGoals = [
@@ -108,11 +112,35 @@ export const sampleProfile = {
   updated_at: makeTimestamp(0),
 };
 
-export const netWorthHistory = [
-  { month: 'Nov', value: 24800 },
-  { month: 'Dec', value: 25400 },
-  { month: 'Jan', value: 26100 },
-  { month: 'Feb', value: 27200 },
-  { month: 'Mar', value: 28900 },
-  { month: 'Apr', value: 29623.60 },
+export const sampleNetWorthHistory = [
+  { id: 'nw-1', user_id: 'demo', date: monthsAgoDate(5), net_worth: 24100, assets: 25800, liabilities: 1700 },
+  { id: 'nw-2', user_id: 'demo', date: monthsAgoDate(4), net_worth: 25300, assets: 27100, liabilities: 1800 },
+  { id: 'nw-3', user_id: 'demo', date: monthsAgoDate(3), net_worth: 26800, assets: 28700, liabilities: 1900 },
+  { id: 'nw-4', user_id: 'demo', date: monthsAgoDate(2), net_worth: 27400, assets: 29400, liabilities: 2000 },
+  { id: 'nw-5', user_id: 'demo', date: monthsAgoDate(1), net_worth: 28700, assets: 30500, liabilities: 1800 },
+  { id: 'nw-6', user_id: 'demo', date: monthsAgoDate(0), net_worth: 29623, assets: 31449, liabilities: 1826 },
 ];
+
+export const sampleCreditScore = {
+  id: 'cs-1',
+  user_id: 'demo',
+  score: 724,
+  provider: 'Experian',
+  rating: 'Good',
+  last_updated: makeDate(0),
+  previous_score: 711,
+  factors: [
+    { factor: 'Payment history', impact: 'positive', detail: 'No missed payments in 24 months', weight: 35 },
+    { factor: 'Credit utilisation', impact: 'warning', detail: 'Amex at 54% utilisation — aim for <30%', weight: 30 },
+    { factor: 'Credit age', impact: 'positive', detail: 'Average account age: 4.2 years', weight: 15 },
+    { factor: 'Credit mix', impact: 'positive', detail: 'Good mix of credit card, mortgage, loan', weight: 10 },
+    { factor: 'New credit', impact: 'neutral', detail: 'No new applications in 12 months', weight: 10 },
+  ],
+  created_at: makeTimestamp(0),
+};
+
+// Keep the old export for backwards compat
+export const netWorthHistory = sampleNetWorthHistory.map(h => {
+  const d = new Date(h.date);
+  return { month: d.toLocaleDateString('en-GB', { month: 'short' }), value: h.net_worth };
+});
