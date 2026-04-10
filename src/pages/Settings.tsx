@@ -1,15 +1,29 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { useDemoMode } from '@/hooks/useDemoMode';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
+import { useAccounts } from '@/hooks/useFinanceData';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryClient } from '@tanstack/react-query';
 
+const institutionLogos: Record<string, { bg: string; letter: string }> = {
+  'Barclays': { bg: '#00AEEF', letter: 'B' },
+  'Monzo': { bg: '#FF3464', letter: 'M' },
+  'Goldman Sachs': { bg: '#1A1A1A', letter: 'G' },
+  'Chase UK': { bg: '#117ACA', letter: 'C' },
+  'American Express': { bg: '#007BC1', letter: 'A' },
+  'Vanguard': { bg: '#961A1A', letter: 'V' },
+  'Coinbase': { bg: '#0052FF', letter: 'C' },
+};
+
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
+  const demo = useDemoMode();
   const { data: profile, isLoading } = useProfile();
+  const { data: accounts } = useAccounts();
   const updateProfile = useUpdateProfile();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -24,11 +38,13 @@ export default function SettingsPage() {
   }
 
   const handleSave = async () => {
+    if (demo) { toast.success('Settings saved (demo)'); return; }
     await updateProfile.mutateAsync({ full_name: name, currency });
     toast.success('Settings saved');
   };
 
   const handleLogout = async () => {
+    if (demo) { navigate('/'); return; }
     await signOut();
     qc.clear();
     navigate('/');
@@ -49,7 +65,7 @@ export default function SettingsPage() {
           </div>
           <div>
             <label className="label-text block mb-1.5">Email</label>
-            <input value={user?.email || ''} readOnly className="w-full bg-muted border rounded-xl px-4 py-2.5 text-sm text-muted-foreground" />
+            <input value={user?.email || (demo ? 'alex@example.com' : '')} readOnly className="w-full bg-muted border rounded-xl px-4 py-2.5 text-sm text-muted-foreground" />
           </div>
           <div>
             <label className="label-text block mb-1.5">Currency</label>
@@ -65,11 +81,35 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Linked accounts */}
+      <div className="clarifi-card">
+        <h2 className="text-sm font-medium mb-4">Linked accounts</h2>
+        <div className="space-y-3">
+          {accounts?.map(a => {
+            const logo = institutionLogos[a.institution || ''];
+            return (
+              <div key={a.id} className="flex items-center gap-3 py-2 border-b last:border-0">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium"
+                  style={{ backgroundColor: logo?.bg || a.colour || '#7F77DD', color: '#fff' }}>
+                  {logo?.letter || (a.institution?.[0] || 'A')}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{a.name}</p>
+                  <p className="text-xs text-muted-foreground">{a.institution || 'Manual'} · {a.type.replace('_', ' ')}</p>
+                </div>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-teal/10 text-teal font-medium">Connected</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="clarifi-card">
         <h2 className="text-sm font-medium mb-4">Subscription</h2>
         <div className="flex items-center gap-3">
           <span className="text-xs px-2 py-1 bg-muted rounded-lg font-medium">Free plan</span>
-          <Button size="sm">Upgrade to Pro</Button>
+          <span className="text-xs text-muted-foreground">28 of 30 free AI messages used</span>
+          <Button size="sm" className="ml-auto">Upgrade to Pro</Button>
         </div>
       </div>
 
@@ -86,8 +126,24 @@ export default function SettingsPage() {
       </div>
 
       <div className="clarifi-card">
+        <h2 className="text-sm font-medium mb-4">Clarifi AI</h2>
+        <div className="space-y-3">
+          <div>
+            <label className="label-text block mb-1.5">Coaching style</label>
+            <select className="bg-background border rounded-xl px-4 py-2.5 text-sm">
+              <option>Concise</option>
+              <option>Detailed</option>
+              <option>Coaching</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="clarifi-card">
         <h2 className="text-sm font-medium mb-4">Account</h2>
-        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-coral">Sign out</Button>
+        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-coral">
+          {demo ? 'Exit demo' : 'Sign out'}
+        </Button>
       </div>
     </div>
   );

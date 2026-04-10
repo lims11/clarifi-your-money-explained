@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles } from 'lucide-react';
 import { useUnreadAlertCount } from '@/hooks/useFinanceData';
 import { useProfile } from '@/hooks/useProfile';
-import { useDemoMode } from '@/hooks/useDemoMode';
+import { useDemoMode, useDemoPrefix } from '@/hooks/useDemoMode';
 
 const baseNavItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -19,7 +19,7 @@ export function AppSidebar() {
   const { data: unreadCount } = useUnreadAlertCount();
   const { data: profile } = useProfile();
   const demo = useDemoMode();
-  const prefix = demo ? '/demo' : '';
+  const prefix = useDemoPrefix();
 
   return (
     <aside className="hidden lg:flex flex-col w-[220px] min-h-screen bg-card border-r fixed left-0 top-0 z-30">
@@ -77,7 +77,7 @@ const mobileBaseItems = [
 export function MobileNav() {
   const location = useLocation();
   const demo = useDemoMode();
-  const prefix = demo ? '/demo' : '';
+  const prefix = useDemoPrefix();
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t z-30 px-2 pb-[env(safe-area-inset-bottom)]">

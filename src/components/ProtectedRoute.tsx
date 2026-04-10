@@ -1,8 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { DemoProvider } from '@/hooks/useDemoMode';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+export function ProtectedRoute({ children, requireAuth = false }: { children: React.ReactNode; requireAuth?: boolean }) {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -17,6 +18,12 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) {
+    // For routes that truly require auth (like onboarding), redirect to login
+    if (requireAuth) return <Navigate to="/login" replace />;
+    // Otherwise show demo data
+    return <DemoProvider>{children}</DemoProvider>;
+  }
+
   return <>{children}</>;
 }

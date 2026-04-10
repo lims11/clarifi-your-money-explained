@@ -32,7 +32,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+            <Route path="/onboarding" element={<ProtectedRoute requireAuth={true}><Onboarding /></ProtectedRoute>} />
 
             {/* Authenticated routes */}
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
@@ -48,7 +48,7 @@ const App = () => (
             </Route>
 
             {/* Demo routes — no auth required */}
-            <Route element={<DemoProvider><AppLayout /></DemoProvider>}>
+            <Route element={<DemoProvider usePrefix={true}><AppLayout /></DemoProvider>}>
               <Route path="/demo" element={<Dashboard />} />
               <Route path="/demo/dashboard" element={<Dashboard />} />
               <Route path="/demo/chat" element={<Chat />} />
