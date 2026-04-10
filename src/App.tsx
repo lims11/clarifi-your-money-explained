@@ -32,7 +32,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+            <Route path="/onboarding" element={<ProtectedRoute requireAuth={true}><Onboarding /></ProtectedRoute>} />
 
             {/* Authenticated routes */}
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
