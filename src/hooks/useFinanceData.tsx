@@ -190,7 +190,7 @@ export function useAddAccount() {
 export function useUpdateAccount() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string } & Record<string, unknown>) => {
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; type?: string; balance?: number; institution?: string; colour?: string; is_active?: boolean }) => {
       const { error } = await supabase.from('accounts').update(updates).eq('id', id);
       if (error) throw error;
     },
@@ -261,7 +261,7 @@ export function useAddBudget() {
 export function useUpdateBudget() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string } & Record<string, unknown>) => {
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; category?: string; amount?: number; period?: string; colour?: string }) => {
       const { error } = await supabase.from('budgets').update(updates).eq('id', id);
       if (error) throw error;
     },
@@ -298,7 +298,7 @@ export function useAddGoal() {
 export function useUpdateGoal() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string } & Record<string, unknown>) => {
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; target_amount?: number; current_amount?: number; target_date?: string; colour?: string; icon?: string }) => {
       const { error } = await supabase.from('goals').update(updates).eq('id', id);
       if (error) throw error;
     },

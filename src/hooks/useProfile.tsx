@@ -23,7 +23,7 @@ export function useUpdateProfile() {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (updates: Record<string, unknown>) => {
+    mutationFn: async (updates: { full_name?: string; currency?: string; onboarding_complete?: boolean; onboarding_step?: number }) => {
       const { error } = await supabase
         .from('profiles')
         .update(updates)
