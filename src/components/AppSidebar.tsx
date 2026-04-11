@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles, BarChart2, Calendar, Gift } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles, BarChart2, Calendar, Gift, MoreHorizontal, X } from 'lucide-react';
 import { useUnreadAlertCount } from '@/hooks/useFinanceData';
 import { useProfile } from '@/hooks/useProfile';
 import { useDemoMode, useDemoPrefix } from '@/hooks/useDemoMode';
@@ -73,29 +74,70 @@ const mobileBaseItems = [
   { path: '/chat', label: 'Chat', icon: MessageSquare, dot: true },
   { path: '/accounts', label: 'Accounts', icon: Wallet },
   { path: '/budgets', label: 'Budgets', icon: PieChart },
+];
+
+const mobileMoreItems = [
+  { path: '/goals', label: 'Goals', icon: Target },
+  { path: '/offers', label: 'Offers', icon: Gift },
+  { path: '/scheduled', label: 'Scheduled', icon: Calendar },
   { path: '/pulse', label: 'Pulse', icon: Bell },
+  { path: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
+  { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function MobileNav() {
   const location = useLocation();
   const demo = useDemoMode();
   const prefix = useDemoPrefix();
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const isMoreActive = mobileMoreItems.some(item => {
+    const to = `${prefix}${item.path}`;
+    return location.pathname === to || location.pathname.startsWith(to + '/');
+  });
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t z-30 px-2 pb-[env(safe-area-inset-bottom)]">
-      <div className="flex justify-around">
-        {mobileBaseItems.map(item => {
-          const to = `${prefix}${item.path}`;
-          const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
-          return (
-            <NavLink key={to} to={to} className={`flex flex-col items-center py-2.5 px-3 text-[11px] transition-colors relative ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
-              <item.icon size={20} />
-              {item.dot && <span className="absolute top-2 right-2.5 w-2 h-2 bg-primary rounded-full" />}
-              <span className="mt-0.5">{item.label}</span>
-            </NavLink>
-          );
-        })}
-      </div>
-    </nav>
+    <>
+      {/* More menu overlay */}
+      {moreOpen && (
+        <div className="lg:hidden fixed inset-0 z-40" onClick={() => setMoreOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute bottom-[60px] left-0 right-0 bg-card border-t rounded-t-2xl p-4 pb-2 animate-in slide-in-from-bottom-4" onClick={e => e.stopPropagation()}>
+            <div className="grid grid-cols-3 gap-1">
+              {mobileMoreItems.map(item => {
+                const to = `${prefix}${item.path}`;
+                const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
+                return (
+                  <NavLink key={to} to={to} onClick={() => setMoreOpen(false)} className={`flex flex-col items-center py-3 px-2 rounded-xl text-xs transition-colors ${isActive ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-muted'}`}>
+                    <item.icon size={20} />
+                    <span className="mt-1">{item.label}</span>
+                  </NavLink>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t z-30 px-2 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex justify-around">
+          {mobileBaseItems.map(item => {
+            const to = `${prefix}${item.path}`;
+            const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
+            return (
+              <NavLink key={to} to={to} className={`flex flex-col items-center py-2.5 px-3 text-[11px] transition-colors relative ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                <item.icon size={20} />
+                {item.dot && <span className="absolute top-2 right-2.5 w-2 h-2 bg-primary rounded-full" />}
+                <span className="mt-0.5">{item.label}</span>
+              </NavLink>
+            );
+          })}
+          <button onClick={() => setMoreOpen(!moreOpen)} className={`flex flex-col items-center py-2.5 px-3 text-[11px] transition-colors ${moreOpen || isMoreActive ? 'text-primary' : 'text-muted-foreground'}`}>
+            {moreOpen ? <X size={20} /> : <MoreHorizontal size={20} />}
+            <span className="mt-0.5">More</span>
+          </button>
+        </div>
+      </nav>
+    </>
   );
 }
