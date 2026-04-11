@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles, BarChart2, Calendar, Gift } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles, BarChart2, Calendar, Gift, MoreHorizontal, X } from 'lucide-react';
 import { useUnreadAlertCount } from '@/hooks/useFinanceData';
 import { useProfile } from '@/hooks/useProfile';
 import { useDemoMode, useDemoPrefix } from '@/hooks/useDemoMode';
