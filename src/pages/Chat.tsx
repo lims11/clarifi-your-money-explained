@@ -198,7 +198,7 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
         <div className="p-4 border-b">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles size={16} className="text-primary" />
-            <span className="text-sm font-medium">Clarifi Chat</span>
+            <span className="text-sm font-medium">Sonfi Chat</span>
           </div>
           <Button variant="ghost" className="w-full justify-start text-sm" onClick={() => setMessages([])}>+ New chat</Button>
         </div>
@@ -213,7 +213,7 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
         {/* Context panel */}
         {accounts && accounts.length > 0 && (
           <div className="p-4 border-t text-xs">
-            <p className="label-text mb-2">Clarifi knows about:</p>
+            <p className="label-text mb-2">Sonfi knows about:</p>
             <div className="space-y-1 text-muted-foreground">
               <p>Net worth: {formatCurrency(accounts.reduce((s, a) => s + Number(a.balance), 0))}</p>
               <p>{accounts.length} accounts</p>
@@ -249,7 +249,7 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
                       <Sparkles size={12} className="text-primary-foreground" />
                     </div>
                   )}
-                  <div className={`group relative max-w-[80%] rounded-2xl px-4 py-3 text-sm ${m.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'clarifi-card'}`}>
+                  <div className={`group relative max-w-[80%] rounded-2xl px-4 py-3 text-sm ${m.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'sonfi-card'}`}>
                     {m.role === 'assistant' ? (
                       <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{m.content}</ReactMarkdown></div>
                     ) : m.content}
@@ -270,7 +270,7 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
                   <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                     <Sparkles size={12} className="text-primary-foreground" />
                   </div>
-                  <div className="clarifi-card px-4 py-3 flex gap-1">
+                  <div className="sonfi-card px-4 py-3 flex gap-1">
                     <span className="w-2 h-2 bg-primary/40 rounded-full animate-pulse-dot" />
                     <span className="w-2 h-2 bg-primary/40 rounded-full animate-pulse-dot" style={{ animationDelay: '0.2s' }} />
                     <span className="w-2 h-2 bg-primary/40 rounded-full animate-pulse-dot" style={{ animationDelay: '0.4s' }} />
@@ -299,7 +299,7 @@ Upcoming bills: ${scheduled?.filter(s => s.is_active).slice(0, 5).map(s => `${s.
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask Clarifi anything..."
+              placeholder="Ask Sonfi anything..."
               rows={1}
               className="flex-1 bg-background border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none min-h-[44px] max-h-32"
               aria-label="Chat message input"

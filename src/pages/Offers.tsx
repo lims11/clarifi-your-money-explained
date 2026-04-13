@@ -13,7 +13,7 @@ const offerCategories = [
 
 const creditCardOffers = [
   {
-    id: 1, name: 'Amex Platinum Cashback', provider: 'American Express', providerLetter: 'A', providerColor: '#007BC1', tag: 'Clarifi Pick',
+    id: 1, name: 'Amex Platinum Cashback', provider: 'American Express', providerLetter: 'A', providerColor: '#007BC1', tag: 'Sonfi Pick',
     features: [{ label: '5% cashback', desc: 'For the first 3 months' }, { label: '1% ongoing', desc: 'On all purchases' }, { label: '94%', desc: 'Approval likelihood' }],
     highlight: 'Based on your score of 724, you have a high chance of approval',
   },
@@ -49,7 +49,7 @@ const carFinanceOffers = [
 
 function OfferCard({ offer }: { offer: typeof creditCardOffers[0] }) {
   return (
-    <div className="clarifi-card p-5">
+    <div className="sonfi-card p-5">
       <div className="flex items-start justify-between mb-3">
         <div>
           {offer.tag && (
@@ -97,7 +97,7 @@ function CreditCardsPage({ onBack }: { onBack: () => void }) {
     <div className="p-5 lg:p-8 max-w-5xl mx-auto space-y-4">
       <SubPageHeader label="Credit Cards" onBack={onBack} />
       <p className="text-sm text-muted-foreground">These cards are matched to your credit score and spending patterns.</p>
-      <p className="text-xs text-muted-foreground">Clarifi is not a lender. Offers are illustrative and based on your profile.</p>
+      <p className="text-xs text-muted-foreground">Sonfi is not a lender. Offers are illustrative and based on your profile.</p>
       <div className="space-y-4">
         {creditCardOffers.map(offer => <OfferCard key={offer.id} offer={offer} />)}
       </div>
@@ -112,7 +112,7 @@ function LoansPage({ onBack }: { onBack: () => void }) {
       <p className="text-sm text-muted-foreground">Personal loans based on your credit score and history.</p>
       <div className="space-y-4">
         {loanOffers.map(offer => (
-          <div key={offer.id} className="clarifi-card p-5">
+          <div key={offer.id} className="sonfi-card p-5">
             <div className="flex items-start justify-between mb-3">
               <div><h3 className="text-sm font-semibold">{offer.name}</h3><p className="text-xs text-muted-foreground">{offer.provider}</p></div>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-white flex-shrink-0" style={{ backgroundColor: offer.providerColor }}>{offer.providerLetter}</div>
@@ -127,7 +127,7 @@ function LoansPage({ onBack }: { onBack: () => void }) {
           </div>
         ))}
       </div>
-      <div className="clarifi-card p-5 bg-muted/30">
+      <div className="sonfi-card p-5 bg-muted/30">
         <h3 className="text-sm font-semibold mb-1">Let's build your credit</h3>
         <p className="text-xs text-muted-foreground">These products can help you build a credit history. If you use them responsibly and repay in full each month, this will be reported to credit reference agencies.</p>
       </div>
@@ -142,7 +142,7 @@ function CarFinancePage({ onBack }: { onBack: () => void }) {
       <h2 className="text-base font-semibold">Looking for your next car?</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {carFinanceOffers.slice(0, 2).map(o => (
-          <div key={o.id} className="clarifi-card p-5 hover:shadow-md transition-shadow cursor-pointer">
+          <div key={o.id} className="sonfi-card p-5 hover:shadow-md transition-shadow cursor-pointer">
             <span className="text-2xl mb-3 block">{o.icon}</span>
             <h3 className="text-sm font-semibold">{o.name}</h3>
             <p className="text-xs text-muted-foreground mt-1">{o.desc}</p>
@@ -152,7 +152,7 @@ function CarFinancePage({ onBack }: { onBack: () => void }) {
       <h3 className="text-base font-semibold">Already have car finance?</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {carFinanceOffers.slice(2).map(o => (
-          <div key={o.id} className="clarifi-card p-5 hover:shadow-md transition-shadow cursor-pointer">
+          <div key={o.id} className="sonfi-card p-5 hover:shadow-md transition-shadow cursor-pointer">
             <span className="text-2xl mb-3 block">{o.icon}</span>
             <h3 className="text-sm font-semibold">{o.name}</h3>
             <p className="text-xs text-muted-foreground mt-1">{o.desc}</p>
@@ -167,7 +167,7 @@ function InsurancePage({ onBack }: { onBack: () => void }) {
   return (
     <div className="p-5 lg:p-8 max-w-5xl mx-auto space-y-4">
       <SubPageHeader label="Car Insurance" onBack={onBack} />
-      <div className="clarifi-card p-5">
+      <div className="sonfi-card p-5">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-xl bg-teal/10 flex items-center justify-center"><Shield size={20} className="text-teal" /></div>
           <div><h3 className="text-sm font-semibold">Compare car insurance quotes</h3><p className="text-xs text-muted-foreground">Get a quote in minutes. No impact on your credit score.</p></div>
@@ -188,7 +188,7 @@ function AccountsPage({ onBack }: { onBack: () => void }) {
     <div className="p-5 lg:p-8 max-w-5xl mx-auto space-y-4">
       <SubPageHeader label="Current Accounts" onBack={onBack} />
       <p className="text-sm text-muted-foreground">Switch or open a new current account.</p>
-      <div className="clarifi-card p-5">
+      <div className="sonfi-card p-5">
         <div className="flex items-start justify-between mb-3">
           <div>
             <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-primary/10 text-primary mb-2"><BadgePercent size={10} /> Switching bonus</span>
@@ -216,7 +216,7 @@ function MortgagesPage({ onBack }: { onBack: () => void }) {
     <div className="p-5 lg:p-8 max-w-5xl mx-auto space-y-4">
       <SubPageHeader label="Mortgages" onBack={onBack} />
       <p className="text-sm text-muted-foreground">Buy a home or get remortgaging advice.</p>
-      <div className="clarifi-card p-5">
+      <div className="sonfi-card p-5">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><Home size={20} className="text-primary" /></div>
           <div><h3 className="text-sm font-semibold">Get mortgage advice</h3><p className="text-xs text-muted-foreground">Talk to a qualified mortgage broker for free</p></div>
@@ -269,7 +269,7 @@ export default function OffersPage() {
           <button
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
-            className="clarifi-card text-left p-4 transition-all hover:shadow-md group"
+            className="sonfi-card text-left p-4 transition-all hover:shadow-md group"
           >
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-muted">
               <cat.icon size={20} className="text-foreground" />
@@ -286,7 +286,7 @@ export default function OffersPage() {
       {/* Disclaimer */}
       <div className="pt-4 border-t">
         <p className="text-xs text-muted-foreground">
-          Clarifi is not a lender or credit broker. We may receive a commission if you take out a product, but we're independent so we will never rank offers based on how much we earn. All offers are illustrative and for demo purposes only.
+          Sonfi is not a lender or credit broker. We may receive a commission if you take out a product, but we're independent so we will never rank offers based on how much we earn. All offers are illustrative and for demo purposes only.
         </p>
         <button className="text-xs font-medium text-primary mt-1 hover:underline">Find out more here</button>
       </div>

@@ -57,7 +57,7 @@ export default function SettingsPage() {
     <div className="p-5 lg:p-8 max-w-3xl mx-auto space-y-6">
       <h1 className="text-xl font-medium">Settings</h1>
 
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <h2 className="text-sm font-medium mb-4">Profile</h2>
         <div className="space-y-4">
           <div>
@@ -83,7 +83,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Linked accounts */}
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <h2 className="text-sm font-medium mb-4">Linked accounts</h2>
         <div className="space-y-3">
           {accounts?.map(a => {
@@ -106,7 +106,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Preferences */}
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <h2 className="text-sm font-medium mb-4">Preferences</h2>
         <div className="divide-y">
           {[
@@ -131,7 +131,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Security & Privacy */}
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <h2 className="text-sm font-medium mb-4">Security</h2>
         <div className="divide-y">
           {[
@@ -157,7 +157,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Display */}
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <h2 className="text-sm font-medium mb-4">Display</h2>
         <div className="divide-y">
           <div className="flex items-center gap-3 py-3 px-2">
@@ -213,7 +213,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <h2 className="text-sm font-medium mb-4">Subscription</h2>
         <div className="flex items-center gap-3">
           <span className="text-xs px-2 py-1 bg-muted rounded-lg font-medium">Free plan</span>
@@ -222,7 +222,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <h2 className="text-sm font-medium mb-4">Notifications</h2>
         <div className="space-y-3">
           {['Pulse alerts', 'Budget warnings', 'Goal milestones', 'Weekly summary email'].map(item => (
@@ -234,8 +234,8 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="clarifi-card">
-        <h2 className="text-sm font-medium mb-4">Clarifi AI</h2>
+      <div className="sonfi-card">
+        <h2 className="text-sm font-medium mb-4">Sonfi AI</h2>
         <div className="space-y-3">
           <div>
             <label className="label-text block mb-1.5">Coaching style</label>
@@ -249,12 +249,12 @@ export default function SettingsPage() {
       </div>
 
       {/* Demo data */}
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <div className="flex items-center gap-2 mb-2">
           <Database size={16} className="text-primary" />
           <h2 className="text-sm font-medium">Demo data</h2>
         </div>
-        <p className="text-xs text-muted-foreground mb-4">Reload the demo dataset to see Clarifi with a fully populated financial profile, or clear all data to start fresh.</p>
+        <p className="text-xs text-muted-foreground mb-4">Reload the demo dataset to see Sonfi with a fully populated financial profile, or clear all data to start fresh.</p>
         <div className="flex gap-2">
           <Button size="sm" onClick={() => {
             toast.success('Demo data reloaded!');
@@ -273,7 +273,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <h2 className="text-sm font-medium mb-4">Account</h2>
         <Button variant="ghost" size="sm" onClick={handleLogout} className="text-coral">
           {demo ? 'Exit demo' : 'Sign out'}

@@ -44,7 +44,7 @@ export default function GoalsPage() {
       </div>
 
       {(!goals || goals.length === 0) ? (
-        <div className="clarifi-card text-center py-12"><p className="text-lg font-medium mb-2">No goals yet</p><p className="text-sm text-muted-foreground mb-4">Set your first savings goal</p><Button onClick={() => setShowAdd(true)}>Add goal</Button></div>
+        <div className="sonfi-card text-center py-12"><p className="text-lg font-medium mb-2">No goals yet</p><p className="text-sm text-muted-foreground mb-4">Set your first savings goal</p><Button onClick={() => setShowAdd(true)}>Add goal</Button></div>
       ) : (
         <div className="space-y-4">
           {goals.map(g => {
@@ -57,7 +57,7 @@ export default function GoalsPage() {
             const statusColor = status === 'Complete' || status === 'On track' ? 'text-teal' : 'text-amber';
 
             return (
-              <div key={g.id} className="clarifi-card">
+              <div key={g.id} className="sonfi-card">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl" style={{ backgroundColor: (g.colour || '#1D9E75') + '20' }}>
                     {g.icon === 'shield' ? '🛡️' : g.icon === 'home' ? '🏠' : g.icon === 'plane' ? '✈️' : '🎯'}

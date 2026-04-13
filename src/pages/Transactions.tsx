@@ -81,7 +81,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Summary */}
-      <div className="clarifi-card mb-4 flex flex-wrap gap-4 text-xs">
+      <div className="sonfi-card mb-4 flex flex-wrap gap-4 text-xs">
         <span>{filtered.length} transactions</span>
         <span className="amount-positive">In: {formatCurrency(totalIn)}</span>
         <span className="amount-negative">Out: {formatCurrency(totalOut)}</span>
@@ -89,7 +89,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Filters */}
-      <div className="clarifi-card mb-5 space-y-3">
+      <div className="sonfi-card mb-5 space-y-3">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search payee or description..." className="w-full bg-background border rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
@@ -110,7 +110,7 @@ export default function TransactionsPage() {
 
       {/* Grouped list */}
       {filtered.length === 0 ? (
-        <div className="clarifi-card text-center py-12">
+        <div className="sonfi-card text-center py-12">
           <p className="text-lg font-medium mb-2">No transactions found</p>
           <p className="text-sm text-muted-foreground">Try adjusting your filters or add a new transaction</p>
         </div>
@@ -119,7 +119,7 @@ export default function TransactionsPage() {
           {Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0])).map(([date, txns]) => (
             <div key={date}>
               <p className="label-text mb-2">{new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-              <div className="clarifi-card divide-y">
+              <div className="sonfi-card divide-y">
                 {txns.map(t => (
                   <div key={t.id}>
                     <div className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 cursor-pointer group" onClick={() => setExpandedTx(expandedTx === t.id ? null : t.id)}>

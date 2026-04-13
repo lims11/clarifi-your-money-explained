@@ -99,7 +99,7 @@ export const sampleScheduledTransactions = [
 ];
 
 export const sampleChatMessages = [
-  { id: 'chat-1', user_id: 'demo', role: 'assistant', content: "Hi! I'm Clarifi, your personal finance coach. I can see your accounts, transactions, and goals. Ask me anything — like \"Am I spending too much on eating out?\" or \"How's my savings rate?\"", created_at: makeTimestamp(1, 10) },
+  { id: 'chat-1', user_id: 'demo', role: 'assistant', content: "Hi! I'm Sonfi, your personal finance coach. I can see your accounts, transactions, and goals. Ask me anything — like \"Am I spending too much on eating out?\" or \"How's my savings rate?\"", created_at: makeTimestamp(1, 10) },
 ];
 
 export const sampleProfile = {

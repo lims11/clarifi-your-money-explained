@@ -37,14 +37,14 @@ export default function PulsePage() {
         ))}
       </div>
       {(!filtered || filtered.length === 0) ? (
-        <div className="clarifi-card text-center py-12"><Bell className="mx-auto mb-3 text-muted-foreground" size={32} /><p className="text-lg font-medium mb-2">No alerts</p><p className="text-sm text-muted-foreground">Clarifi will notify you when something needs attention</p></div>
+        <div className="sonfi-card text-center py-12"><Bell className="mx-auto mb-3 text-muted-foreground" size={32} /><p className="text-lg font-medium mb-2">No alerts</p><p className="text-sm text-muted-foreground">Sonfi will notify you when something needs attention</p></div>
       ) : (
         <div className="space-y-3">
           {filtered.map(a => {
             const config = typeConfig[a.type] || typeConfig.insight;
             const Icon = config.icon;
             return (
-              <div key={a.id} className={`clarifi-card border-l-4 ${config.border} ${!a.is_read ? config.bg : ''}`} onClick={() => !a.is_read && markRead.mutate(a.id)}>
+              <div key={a.id} className={`sonfi-card border-l-4 ${config.border} ${!a.is_read ? config.bg : ''}`} onClick={() => !a.is_read && markRead.mutate(a.id)}>
                 <div className="flex items-start gap-3">
                   <Icon size={18} className={`${config.color} mt-0.5 flex-shrink-0`} />
                   <div className="flex-1">
@@ -56,7 +56,7 @@ export default function PulsePage() {
                     <p className="text-sm text-muted-foreground leading-relaxed">{a.body}</p>
                     <div className="flex gap-2 mt-3">
                       <Link to={`/chat?q=${encodeURIComponent(a.title)}`}>
-                        <Button variant="ghost" size="sm" className="text-xs h-7"><MessageSquare size={12} className="mr-1" /> Ask Clarifi</Button>
+                        <Button variant="ghost" size="sm" className="text-xs h-7"><MessageSquare size={12} className="mr-1" /> Ask Sonfi</Button>
                       </Link>
                     </div>
                   </div>

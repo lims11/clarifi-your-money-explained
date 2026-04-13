@@ -15,7 +15,7 @@ export function FinancialHealthScore({ totalScore, factors }: { totalScore: numb
   const colour = totalScore >= 75 ? '#1D9E75' : totalScore >= 50 ? '#EF9F27' : '#D85A30';
 
   return (
-    <div className="clarifi-card">
+    <div className="sonfi-card">
       <div className="flex items-center gap-3">
         <Heart size={20} style={{ color: colour }} />
         <div className="flex-1">

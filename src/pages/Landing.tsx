@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Wand2, Bell, ArrowRight, Star, Check } from 'lucide-react';
+import sonfiLogo from '@/assets/sonfi-logo-horizontal.png';
 
 const features = [
   { icon: MessageSquare, title: 'Ask anything', desc: 'Type questions in plain English. Get answers from your actual data.' },
@@ -9,7 +10,7 @@ const features = [
 ];
 
 const testimonials = [
-  { name: 'Sarah M.', location: 'London', text: "Clarifi spotted that I was paying £45/month for a gym I hadn't used in 3 months. Cancelled the same day.", rating: 5 },
+  { name: 'Sarah M.', location: 'London', text: "Sonfi spotted that I was paying £45/month for a gym I hadn't used in 3 months. Cancelled the same day.", rating: 5 },
   { name: 'Tom K.', location: 'Bristol', text: "I've tried every budgeting app. This is the first one where I actually understand where my money goes.", rating: 5 },
   { name: 'Priya R.', location: 'Manchester', text: "The AI chat is brilliant. Asked it if I could afford a holiday and it broke down exactly how to make it work.", rating: 5 },
 ];
@@ -26,7 +27,7 @@ export default function LandingPage() {
       {/* Nav */}
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <span className="text-xl font-medium text-primary">Clarifi</span>
+          <img src={sonfiLogo} alt="Sonfi" className="h-8" />
           <div className="flex items-center gap-3">
             <Link to="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
             <Link to="/login?tab=signup"><Button size="sm">Get started free</Button></Link>
@@ -42,7 +43,7 @@ export default function LandingPage() {
               Your money,<br />finally explained.
             </h1>
             <p className="mt-5 text-lg text-muted-foreground leading-relaxed max-w-lg">
-              Connect your accounts and ask anything. Clarifi reads your real data and answers in plain English — like having a financial advisor in your pocket.
+              Connect your accounts and ask anything. Sonfi reads your real data and answers in plain English — like having a financial advisor in your pocket.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/login?tab=signup"><Button size="lg">Start for free</Button></Link>
@@ -50,12 +51,12 @@ export default function LandingPage() {
             </div>
             <p className="mt-4 text-xs text-muted-foreground">Free to start · No card required · Runs on your real data</p>
           </div>
-          <div className="clarifi-card p-0 overflow-hidden">
+          <div className="sonfi-card p-0 overflow-hidden">
             <div className="bg-primary/5 px-4 py-3 border-b flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
                 <MessageSquare size={12} className="text-primary-foreground" />
               </div>
-              <span className="text-sm font-medium">Clarifi Chat</span>
+              <span className="text-sm font-medium">Sonfi Chat</span>
             </div>
             <div className="p-4 space-y-3">
               <div className="flex justify-end">
@@ -64,7 +65,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="flex justify-start">
-                <div className="clarifi-card p-3 text-sm max-w-[85%] leading-relaxed">
+                <div className="sonfi-card p-3 text-sm max-w-[85%] leading-relaxed">
                   Looking at your last 30 days, you've spent <strong>£28.50</strong> on takeaways and eating out, which is well within your <strong>£200 monthly budget</strong> — you're only 14% through it with 18 days to go. 🎉
                 </div>
               </div>
@@ -77,7 +78,7 @@ export default function LandingPage() {
       <section id="features" className="max-w-6xl mx-auto px-6 pb-24">
         <div className="grid md:grid-cols-3 gap-5">
           {features.map(f => (
-            <div key={f.title} className="clarifi-card text-center py-8">
+            <div key={f.title} className="sonfi-card text-center py-8">
               <div className="w-12 h-12 rounded-2xl bg-primary-light flex items-center justify-center mx-auto mb-4">
                 <f.icon size={22} className="text-primary" />
               </div>
@@ -91,18 +92,18 @@ export default function LandingPage() {
       {/* Feature sections */}
       <section className="max-w-6xl mx-auto px-6 pb-24 space-y-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="clarifi-card p-6 space-y-3">
+          <div className="sonfi-card p-6 space-y-3">
             <div className="flex gap-2 mb-2">
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><MessageSquare size={14} className="text-primary-foreground" /></div>
               <div className="flex-1">
-                <div className="text-xs text-muted-foreground">Clarifi</div>
+                <div className="text-xs text-muted-foreground">Sonfi</div>
                 <div className="text-sm mt-1">You have <strong>3 subscriptions</strong> totalling <strong>£47.97/month</strong> that haven't been used in 60+ days...</div>
               </div>
             </div>
           </div>
           <div>
             <h2 className="text-2xl font-medium mb-3">Ask your money anything</h2>
-            <p className="text-muted-foreground mb-4">Clarifi analyses your real financial data and answers questions in plain English.</p>
+            <p className="text-muted-foreground mb-4">Sonfi analyses your real financial data and answers questions in plain English.</p>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2"><ArrowRight size={14} className="text-primary" /> "Where is my money actually going?"</li>
               <li className="flex items-center gap-2"><ArrowRight size={14} className="text-primary" /> "Can I afford £500 this weekend?"</li>
@@ -122,7 +123,7 @@ export default function LandingPage() {
               { type: 'insight', color: 'border-l-primary', text: '3 subscriptions unused in 60+ days' },
               { type: 'success', color: 'border-l-teal', text: 'All 4 budgets on track this month' },
             ].map(a => (
-              <div key={a.text} className={`clarifi-card border-l-4 ${a.color} p-4`}>
+              <div key={a.text} className={`sonfi-card border-l-4 ${a.color} p-4`}>
                 <p className="label-text mb-1">{a.type}</p>
                 <p className="text-sm font-medium">{a.text}</p>
               </div>
@@ -136,7 +137,7 @@ export default function LandingPage() {
         <h2 className="text-2xl font-medium text-center mb-10">What people are saying</h2>
         <div className="grid md:grid-cols-3 gap-5">
           {testimonials.map(t => (
-            <div key={t.name} className="clarifi-card">
+            <div key={t.name} className="sonfi-card">
               <div className="flex gap-0.5 mb-3">
                 {Array.from({ length: t.rating }).map((_, i) => (
                   <Star key={i} size={14} className="fill-amber text-amber" />
@@ -155,7 +156,7 @@ export default function LandingPage() {
         <h2 className="text-2xl font-medium text-center mb-10">Simple pricing</h2>
         <div className="grid md:grid-cols-3 gap-5">
           {plans.map(p => (
-            <div key={p.name} className={`clarifi-card ${p.recommended ? 'border-primary border-2 relative' : ''}`}>
+            <div key={p.name} className={`sonfi-card ${p.recommended ? 'border-primary border-2 relative' : ''}`}>
               {p.recommended && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full font-medium">
                   Recommended
@@ -189,13 +190,13 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t py-10">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className="text-lg font-medium text-primary">Clarifi</span>
+          <img src={sonfiLogo} alt="Sonfi" className="h-6" />
           <div className="flex gap-6 text-sm text-muted-foreground">
             <span>Privacy</span>
             <span>Terms</span>
             <span>Contact</span>
           </div>
-          <p className="text-xs text-muted-foreground">© 2026 Clarifi. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground">© 2026 Sonfi. All rights reserved.</p>
         </div>
       </footer>
     </div>
