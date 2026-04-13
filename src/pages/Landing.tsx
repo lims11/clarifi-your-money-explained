@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Wand2, Bell, ArrowRight, Star, Check } from 'lucide-react';
+import sonfiLogo from '@/assets/sonfi-logo-horizontal.png';
 
 const features = [
   { icon: MessageSquare, title: 'Ask anything', desc: 'Type questions in plain English. Get answers from your actual data.' },
@@ -26,7 +27,7 @@ export default function LandingPage() {
       {/* Nav */}
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <span className="text-xl font-medium text-primary">Sonfi</span>
+          <img src={sonfiLogo} alt="Sonfi" className="h-8" />
           <div className="flex items-center gap-3">
             <Link to="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
             <Link to="/login?tab=signup"><Button size="sm">Get started free</Button></Link>
@@ -189,7 +190,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t py-10">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className="text-lg font-medium text-primary">Sonfi</span>
+          <img src={sonfiLogo} alt="Sonfi" className="h-6" />
           <div className="flex gap-6 text-sm text-muted-foreground">
             <span>Privacy</span>
             <span>Terms</span>

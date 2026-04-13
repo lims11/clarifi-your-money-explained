@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import sonfiLogo from '@/assets/sonfi-logo-vertical.png';
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
@@ -39,7 +40,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-medium text-primary mb-1">Sonfi</h1>
+          <img src={sonfiLogo} alt="Sonfi" className="h-16 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">Your money, finally explained.</p>
         </div>
 
