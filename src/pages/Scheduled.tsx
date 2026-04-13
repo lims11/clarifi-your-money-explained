@@ -89,21 +89,21 @@ export default function ScheduledPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           <p className="text-xs text-muted-foreground mb-1">Monthly expenses</p>
           <p className="text-lg font-semibold text-coral">-£{totalExpenses.toFixed(2)}</p>
         </div>
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           <p className="text-xs text-muted-foreground mb-1">Monthly income</p>
           <p className="text-lg font-semibold text-teal">+£{totalIncome.toFixed(2)}</p>
         </div>
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           <p className="text-xs text-muted-foreground mb-1">Net monthly</p>
           <p className={`text-lg font-semibold ${totalIncome - totalExpenses >= 0 ? 'text-teal' : 'text-coral'}`}>
             {totalIncome - totalExpenses >= 0 ? '+' : ''}£{(totalIncome - totalExpenses).toFixed(2)}
           </p>
         </div>
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           <p className="text-xs text-muted-foreground mb-1">Active items</p>
           <p className="text-lg font-semibold">{scheduled?.length || 0}</p>
         </div>
@@ -111,7 +111,7 @@ export default function ScheduledPage() {
 
       <div className="grid lg:grid-cols-[1fr_360px] gap-6">
         {/* Calendar */}
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           {/* Calendar header */}
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
@@ -197,7 +197,7 @@ export default function ScheduledPage() {
 
         {/* Upcoming list */}
         <div className="space-y-3">
-          <div className="clarifi-card">
+          <div className="sonfi-card">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium">Expenses</h3>
               <span className="text-xs text-muted-foreground">{format(currentMonth, 'MMMM')}</span>
@@ -224,7 +224,7 @@ export default function ScheduledPage() {
             </div>
           </div>
 
-          <div className="clarifi-card">
+          <div className="sonfi-card">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium">Income</h3>
             </div>
@@ -251,7 +251,7 @@ export default function ScheduledPage() {
           </div>
 
           {/* Summary */}
-          <div className="clarifi-card bg-muted/30">
+          <div className="sonfi-card bg-muted/30">
             <p className="text-xs text-muted-foreground mb-2">Next week's forecast</p>
             <div className="space-y-1.5">
               {sortedScheduled

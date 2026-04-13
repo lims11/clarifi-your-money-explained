@@ -57,7 +57,7 @@ export function CreditScoreWidget({ data }: { data: CreditScoreData }) {
   const describeFillArc = `M ${bgStartX} ${bgStartY} A ${radius} ${radius} 0 ${fillSweep > 180 ? 1 : 0} 0 ${fillEndX} ${fillEndY}`;
 
   return (
-    <div className="clarifi-card">
+    <div className="sonfi-card">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div>

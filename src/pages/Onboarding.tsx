@@ -75,7 +75,7 @@ export default function OnboardingPage() {
       // Mark onboarding complete
       await updateProfile.mutateAsync({ onboarding_complete: true, onboarding_step: 8 });
 
-      toast.success('All set! Welcome to Clarifi.');
+      toast.success('All set! Welcome to Sonfi.');
       navigate('/dashboard');
     } catch (err) {
       console.error('Onboarding error:', err);

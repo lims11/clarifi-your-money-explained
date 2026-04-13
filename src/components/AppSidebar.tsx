@@ -27,7 +27,7 @@ export function AppSidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-[220px] min-h-screen bg-card border-r fixed left-0 top-0 z-30">
       <div className="p-5 pb-4">
-        <span className="text-xl font-medium text-primary">Clarifi</span>
+        <span className="text-xl font-medium text-primary">Sonfi</span>
         {demo && <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-amber/20 text-amber font-medium">DEMO</span>}
       </div>
       <nav className="flex-1 px-3 space-y-0.5">

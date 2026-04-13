@@ -94,7 +94,7 @@
 }
 
 @layer components {
-  .clarifi-card {
+  .sonfi-card {
     @apply bg-card rounded-2xl border p-5;
   }
   .label-text {

@@ -71,7 +71,7 @@ export default function AccountsPage() {
     return (
       <div className="p-5 lg:p-8 max-w-4xl mx-auto">
         <Link to="/accounts" className="text-xs text-primary hover:underline mb-4 block">← All accounts</Link>
-        <div className="clarifi-card mb-6">
+        <div className="sonfi-card mb-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-medium"
               style={{ backgroundColor: logo?.bg || account.colour || '#7F77DD', color: logo?.dark ? '#1A1A1A' : '#fff' }}>
@@ -90,7 +90,7 @@ export default function AccountsPage() {
           <Button size="sm" onClick={() => setShowAddTxn(true)}><Plus size={14} /> Add</Button>
         </div>
         {accountTxns.length > 0 ? (
-          <div className="clarifi-card divide-y">
+          <div className="sonfi-card divide-y">
             {accountTxns.map(t => (
               <div key={t.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
                 <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: Number(t.amount) > 0 ? '#1D9E75' : '#D85A30' }} />
@@ -106,7 +106,7 @@ export default function AccountsPage() {
             ))}
           </div>
         ) : (
-          <div className="clarifi-card text-center py-8">
+          <div className="sonfi-card text-center py-8">
             <p className="text-muted-foreground text-sm">No transactions for this account</p>
           </div>
         )}
@@ -176,7 +176,7 @@ export default function AccountsPage() {
       </div>
 
       {(!accounts || accounts.length === 0) ? (
-        <div className="clarifi-card text-center py-12">
+        <div className="sonfi-card text-center py-12">
           <p className="text-lg font-medium mb-2">No accounts yet</p>
           <p className="text-sm text-muted-foreground mb-4">Add your first account to start tracking</p>
           <Button onClick={() => setShowAddAccount(true)}>Add account</Button>
@@ -200,7 +200,7 @@ export default function AccountsPage() {
                     const spark = Array.from({ length: 7 }, (_, i) => ({ v: Number(a.balance) + (Math.random() - 0.5) * 200 * (7 - i) }));
 
                     return (
-                      <div key={a.id} className="clarifi-card hover:border-primary/20 transition-colors">
+                      <div key={a.id} className="sonfi-card hover:border-primary/20 transition-colors">
                         <div className="flex items-center gap-4">
                           <Link to={`/accounts/${a.id}`} className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium flex-shrink-0"
                             style={{ backgroundColor: logo?.bg || a.colour || '#7F77DD', color: logo?.dark ? '#1A1A1A' : '#fff' }}>

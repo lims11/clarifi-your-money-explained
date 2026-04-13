@@ -39,11 +39,11 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-medium text-primary mb-1">Clarifi</h1>
+          <h1 className="text-2xl font-medium text-primary mb-1">Sonfi</h1>
           <p className="text-sm text-muted-foreground">Your money, finally explained.</p>
         </div>
 
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           <div className="flex border-b mb-6">
             <button onClick={() => setTab('signin')} className={`flex-1 pb-3 text-sm font-medium transition-colors ${tab === 'signin' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Sign in</button>
             <button onClick={() => setTab('signup')} className={`flex-1 pb-3 text-sm font-medium transition-colors ${tab === 'signup' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Create account</button>

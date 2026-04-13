@@ -126,7 +126,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Net worth card */}
-      <div className="clarifi-card">
+      <div className="sonfi-card">
         <p className="label-text mb-1">Net worth</p>
         <p className="text-3xl font-medium">{formatCurrency(stats.netWorth)}</p>
         <div className="flex gap-6 mt-3 text-sm">
@@ -161,29 +161,29 @@ export default function DashboardPage() {
       </div>
 
       {/* Chat bar */}
-      <Link to="/chat" className="clarifi-card flex items-center gap-3 hover:border-primary/30 transition-colors cursor-pointer">
+      <Link to="/chat" className="sonfi-card flex items-center gap-3 hover:border-primary/30 transition-colors cursor-pointer">
         <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
           <Sparkles size={14} className="text-primary-foreground" />
         </div>
-        <span className="text-sm text-muted-foreground flex-1">Ask Clarifi anything... e.g. "Am I spending too much on eating out?"</span>
+        <span className="text-sm text-muted-foreground flex-1">Ask Sonfi anything... e.g. "Am I spending too much on eating out?"</span>
         <ArrowRight size={16} className="text-primary" />
       </Link>
 
       {/* Stats row - 6 cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-        <div className="clarifi-card"><p className="label-text mb-1">Income</p><p className="text-lg font-medium amount-positive">{formatCurrency(stats.income)}</p></div>
-        <div className="clarifi-card"><p className="label-text mb-1">Expenses</p><p className="text-lg font-medium amount-negative">{formatCurrency(stats.expenses)}</p></div>
-        <div className="clarifi-card"><p className="label-text mb-1">Budget left</p><p className="text-lg font-medium text-primary">{formatCurrency(stats.totalBudget - stats.expenses)}</p></div>
-        <div className="clarifi-card"><p className="label-text mb-1">Savings goal</p><p className="text-lg font-medium text-teal">{topGoalPct}%</p></div>
-        <div className="clarifi-card"><p className="label-text mb-1">Savings rate</p><p className={`text-lg font-medium ${stats.savingsRate >= 20 ? 'text-teal' : stats.savingsRate >= 10 ? 'text-amber' : 'text-coral'}`}>{stats.savingsRate.toFixed(0)}%</p></div>
-        <div className="clarifi-card"><p className="label-text mb-1">Net change</p><p className={`text-lg font-medium flex items-center gap-1 ${stats.income - stats.expenses >= 0 ? 'amount-positive' : 'amount-negative'}`}>{stats.income - stats.expenses >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}{formatCurrency(Math.abs(stats.income - stats.expenses))}</p></div>
+        <div className="sonfi-card"><p className="label-text mb-1">Income</p><p className="text-lg font-medium amount-positive">{formatCurrency(stats.income)}</p></div>
+        <div className="sonfi-card"><p className="label-text mb-1">Expenses</p><p className="text-lg font-medium amount-negative">{formatCurrency(stats.expenses)}</p></div>
+        <div className="sonfi-card"><p className="label-text mb-1">Budget left</p><p className="text-lg font-medium text-primary">{formatCurrency(stats.totalBudget - stats.expenses)}</p></div>
+        <div className="sonfi-card"><p className="label-text mb-1">Savings goal</p><p className="text-lg font-medium text-teal">{topGoalPct}%</p></div>
+        <div className="sonfi-card"><p className="label-text mb-1">Savings rate</p><p className={`text-lg font-medium ${stats.savingsRate >= 20 ? 'text-teal' : stats.savingsRate >= 10 ? 'text-amber' : 'text-coral'}`}>{stats.savingsRate.toFixed(0)}%</p></div>
+        <div className="sonfi-card"><p className="label-text mb-1">Net change</p><p className={`text-lg font-medium flex items-center gap-1 ${stats.income - stats.expenses >= 0 ? 'amount-positive' : 'amount-negative'}`}>{stats.income - stats.expenses >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}{formatCurrency(Math.abs(stats.income - stats.expenses))}</p></div>
       </div>
 
       {/* Two column */}
       <div className="grid lg:grid-cols-5 gap-5">
         <div className="lg:col-span-3 space-y-5">
           {/* Recent transactions */}
-          <div className="clarifi-card">
+          <div className="sonfi-card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-medium">Recent transactions</h2>
               <Link to="/transactions" className="text-xs text-primary hover:underline">View all</Link>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 space-y-5">
           {/* Spending doughnut */}
           {stats.categoryData.length > 0 && (
-            <div className="clarifi-card">
+            <div className="sonfi-card">
               <h2 className="text-sm font-medium mb-4">Spending this month</h2>
               <div className="flex items-center justify-center" role="img" aria-label="Spending by category doughnut chart">
                 <div className="relative w-44 h-44">
@@ -249,7 +249,7 @@ export default function DashboardPage() {
           )}
 
           {/* Pulse */}
-          <div className="clarifi-card">
+          <div className="sonfi-card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-medium">Pulse</h2>
               <Link to="/pulse" className="text-xs text-primary hover:underline">View all</Link>
@@ -269,7 +269,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Goals */}
-          <div className="clarifi-card">
+          <div className="sonfi-card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-medium">Savings goals</h2>
               <Link to="/goals" className="text-xs text-primary hover:underline">View all</Link>
@@ -292,7 +292,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Upcoming bills */}
-          <div className="clarifi-card">
+          <div className="sonfi-card">
             <h2 className="text-sm font-medium mb-4">Upcoming bills</h2>
             {scheduled && scheduled.filter(s => Number(s.amount) < 0).length > 0 ? (
               <div className="space-y-2.5">

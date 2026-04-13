@@ -107,14 +107,14 @@ export default function BudgetsPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="clarifi-card text-center"><p className="text-2xl font-medium text-teal">{onTrack}</p><p className="label-text mt-1">On track</p></div>
-        <div className="clarifi-card text-center"><p className="text-2xl font-medium text-coral">{overBudget}</p><p className="label-text mt-1">Over budget</p></div>
-        <div className="clarifi-card text-center"><p className="text-2xl font-medium text-muted-foreground">{isCurrentMonth ? daysLeft : '—'}</p><p className="label-text mt-1">{isCurrentMonth ? 'Days left' : 'Completed'}</p></div>
+        <div className="sonfi-card text-center"><p className="text-2xl font-medium text-teal">{onTrack}</p><p className="label-text mt-1">On track</p></div>
+        <div className="sonfi-card text-center"><p className="text-2xl font-medium text-coral">{overBudget}</p><p className="label-text mt-1">Over budget</p></div>
+        <div className="sonfi-card text-center"><p className="text-2xl font-medium text-muted-foreground">{isCurrentMonth ? daysLeft : '—'}</p><p className="label-text mt-1">{isCurrentMonth ? 'Days left' : 'Completed'}</p></div>
       </div>
 
       {/* Spending Breakdown donut */}
       {expensePieData.length > 0 && (
-        <div className="clarifi-card mb-6">
+        <div className="sonfi-card mb-6">
           <h2 className="text-sm font-medium mb-4">{MONTH_NAMES[selectedMonth]} Spending Breakdown</h2>
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="h-52 w-52 flex-shrink-0">
@@ -170,7 +170,7 @@ export default function BudgetsPage() {
       {/* Monthly overview — Start/End Balance & Savings */}
       <div className="grid md:grid-cols-2 gap-4 mb-6">
         {/* Planned vs Actual bars */}
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           <h2 className="text-sm font-medium mb-4">
             {MONTH_NAMES[selectedMonth]} — {isCurrentMonth ? 'Planned vs Actual' : 'Planned vs Spent'}
           </h2>
@@ -231,7 +231,7 @@ export default function BudgetsPage() {
         </div>
 
         {/* Savings card */}
-        <div className="clarifi-card flex flex-col items-center justify-center text-center">
+        <div className="sonfi-card flex flex-col items-center justify-center text-center">
           <p className={`text-3xl font-bold ${savedAmount >= 0 ? 'text-teal' : 'text-coral'}`}>
             {savedAmount >= 0 ? '+' : ''}{savingsPercent}%
           </p>
@@ -247,7 +247,7 @@ export default function BudgetsPage() {
       {/* Side-by-side breakdown: Expenses & Income */}
       <div className="grid md:grid-cols-2 gap-4 mb-6">
         {/* Expenses breakdown */}
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           <h2 className="text-sm font-medium mb-3 text-coral">Expenses</h2>
           <div className="border-b border-border pb-2 mb-2 flex justify-between text-xs text-muted-foreground font-medium">
             <span>Category</span>
@@ -290,7 +290,7 @@ export default function BudgetsPage() {
         </div>
 
         {/* Income breakdown */}
-        <div className="clarifi-card">
+        <div className="sonfi-card">
           <h2 className="text-sm font-medium mb-3 text-teal">Income</h2>
           <div className="border-b border-border pb-2 mb-2 flex justify-between text-xs text-muted-foreground font-medium">
             <span>Source</span>
@@ -328,14 +328,14 @@ export default function BudgetsPage() {
 
       {/* Budget cards */}
       {budgetsWithSpend.length === 0 ? (
-        <div className="clarifi-card text-center py-12"><p className="text-lg font-medium mb-2">No budgets yet</p><p className="text-sm text-muted-foreground mb-4">Create your first budget to track spending</p><Button onClick={() => setShowAdd(true)}>Add budget</Button></div>
+        <div className="sonfi-card text-center py-12"><p className="text-lg font-medium mb-2">No budgets yet</p><p className="text-sm text-muted-foreground mb-4">Create your first budget to track spending</p><Button onClick={() => setShowAdd(true)}>Add budget</Button></div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {budgetsWithSpend.map(b => {
             const barColor = b.pct >= 100 ? 'bg-coral' : b.pct >= 80 ? 'bg-amber' : b.pct >= 50 ? 'bg-primary' : 'bg-teal';
             const projected = daysLeft > 0 ? (b.spent / Math.max(1, dayOfMonth)) * daysInMonth : b.spent;
             return (
-              <div key={b.id} className="clarifi-card">
+              <div key={b.id} className="sonfi-card">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-lg">{categoryIcons[b.category] || '📊'}</span>
                   <h3 className="text-sm font-medium flex-1">{b.name}</h3>
