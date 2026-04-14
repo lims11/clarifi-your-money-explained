@@ -10,6 +10,7 @@ import logoFooter from '@/assets/sonfi-logo-horizontal-dark.png';
 import lifestyle1 from '@/assets/landing-lifestyle-1.png';
 import lifestyle2 from '@/assets/landing-lifestyle-2.png';
 import phoneMockupImg from '@/assets/phone-mockup-dashboard.png';
+import budgetsScreenshot from '@/assets/budgets-screenshot.png';
 
 function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
   const { ref, visible } = useScrollReveal();
