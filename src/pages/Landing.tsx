@@ -134,7 +134,7 @@ export default function LandingPage() {
                </p>
                <Link
                  to="/login?tab=signup"
-                 className="inline-flex items-center gap-2 bg-white text-[#1E1B4B] font-semibold px-6 py-3 rounded-full hover:bg-[#C4B5FD] transition-all text-sm"
+                 className="inline-flex items-center gap-2 bg-[#1E1B4B] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#2D2A5E] transition-all text-sm"
                >
                  Get started free <ArrowRight size={16} />
                </Link>
