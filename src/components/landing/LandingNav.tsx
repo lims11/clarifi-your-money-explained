@@ -14,8 +14,7 @@ export default function LandingNav() {
 
   const navLinks = [
     { label: 'Features', href: '#features' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'Credit Score', href: '#credit-score' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'Blog', href: '#' },
   ];
 
