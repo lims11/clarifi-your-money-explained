@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import logoHorizontal from '@/assets/logo-horizontal.png';
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -26,8 +27,8 @@ export default function LandingNav() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link to="/" className="text-[#1a1145] font-extrabold text-xl tracking-tight">
-          SONFI
+        <Link to="/">
+          <img src={logoHorizontal} alt="Sonfi" className="h-7 sm:h-8" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
