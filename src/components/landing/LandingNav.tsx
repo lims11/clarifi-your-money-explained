@@ -15,8 +15,9 @@ export default function LandingNav() {
   }, []);
 
   const navLinks = [
-    { label: 'Features', href: '/#features', isHash: true },
-    { label: 'Blog', href: '#', isHash: true },
+    { label: 'Features', href: '/features', isHash: false },
+    { label: 'Pricing', href: '/pricing', isHash: false },
+    { label: 'Blog', href: '/blog', isHash: false },
   ];
 
   return (
