@@ -69,7 +69,7 @@ export default function LandingPage() {
             <div className="relative hidden md:block">
               <div className="animate-float">
                 <LaptopMockup className="w-full max-w-[560px] mx-auto">
-                  <DashboardWebMockup />
+                  <img src={landingDashboard} alt="Sonfi Dashboard" className="w-full" />
                 </LaptopMockup>
               </div>
               <div className="absolute -bottom-8 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
@@ -128,9 +128,9 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="flex justify-center">
-            <div className="w-[240px] sm:w-[280px] transform hover:scale-[1.02] transition-transform duration-500">
+            <div className="w-[260px] sm:w-[300px] transform hover:scale-[1.02] transition-transform duration-500">
               <PhoneMockup>
-                <ChatMockup />
+                <img src={landingChat} alt="Sonfi AI Chat" className="w-full" loading="lazy" />
               </PhoneMockup>
             </div>
           </div>
@@ -195,7 +195,7 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
               <LaptopMockup className="max-w-[520px] mx-auto transform lg:-rotate-1 hover:rotate-0 transition-transform duration-500">
-                <BudgetsWebMockup />
+                <img src={landingBudgets} alt="Sonfi Budgets" className="w-full" loading="lazy" />
               </LaptopMockup>
             </div>
             <div>
