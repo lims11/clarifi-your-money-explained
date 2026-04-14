@@ -7,9 +7,8 @@ import { ChatMockup, PulseMockup, CreditScoreMockup } from '@/components/landing
 import { BudgetsWebMockup, AccountsWebMockup, ScheduledWebMockup, PulseWebMockup } from '@/components/landing/WebMockups';
 import { useScrollReveal } from '@/components/landing/useScrollReveal';
 import logoFooter from '@/assets/sonfi-logo-horizontal-dark.png';
-import person1 from '@/assets/landing-person-1.jpg';
-import person2 from '@/assets/landing-person-2.jpg';
-import person3 from '@/assets/landing-person-3.jpg';
+import lifestyle1 from '@/assets/landing-lifestyle-1.png';
+import lifestyle2 from '@/assets/landing-lifestyle-2.png';
 
 function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
   const { ref, visible } = useScrollReveal();
@@ -74,7 +73,7 @@ export default function LandingPage() {
                   <DashboardWebMockup />
                 </LaptopMockup>
               </div>
-              <div className="absolute -bottom-4 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
+              <div className="absolute -bottom-2 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
                 <PhoneMockup>
                   <DashboardMobileMockup />
                 </PhoneMockup>
@@ -116,21 +115,13 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── LIFESTYLE BANNER ── */}
+      {/* ── LIFESTYLE IMAGE 1 ── */}
       <Section className="py-16 sm:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 gap-4 sm:gap-6">
-            <div className="rounded-2xl overflow-hidden aspect-square">
-              <img src={person1} alt="Woman managing finances on phone" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
-            </div>
-            <div className="rounded-2xl overflow-hidden aspect-square">
-              <img src={person2} alt="Man reviewing budget on laptop" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
-            </div>
-            <div className="rounded-2xl overflow-hidden aspect-square">
-              <img src={person3} alt="Couple planning finances together" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
-            </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl overflow-hidden shadow-xl">
+            <img src={lifestyle1} alt="Woman using Sonfi app on her phone to manage finances" className="w-full h-auto object-cover" loading="lazy" />
           </div>
-          <p className="text-center text-[#6B7280] text-sm mt-6">Trusted by thousands across the UK to manage their money smarter.</p>
+          <p className="text-center text-[#6B7280] text-sm mt-6">Real insights. Real control. Right in your pocket.</p>
         </div>
       </Section>
 
@@ -291,17 +282,27 @@ export default function LandingPage() {
         </Section>
       </div>
 
-      {/* ── TESTIMONIALS ── */}
+      {/* ── LIFESTYLE IMAGE 2 ── */}
       <Section className="bg-white py-16 sm:py-24">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl overflow-hidden shadow-xl">
+            <img src={lifestyle2} alt="Professional managing finances with Sonfi on phone and laptop" className="w-full h-auto object-cover" loading="lazy" />
+          </div>
+          <p className="text-center text-[#6B7280] text-sm mt-6">Whether at home or on the go — Sonfi keeps your finances clear.</p>
+        </div>
+      </Section>
+
+      {/* ── TESTIMONIALS ── */}
+      <Section className="bg-[#F8F9FC] py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight text-center mb-12">
             Real people. Real results.
           </h2>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { name: 'Sarah M.', loc: 'London', text: "I finally feel in control of my money. The AI chat is like having a financial adviser in my pocket.", img: person1 },
-              { name: 'James T.', loc: 'Manchester', text: "Pulse caught me overspending on subscriptions and showed me which to cancel. Saved £40 a month.", img: person2 },
-              { name: 'Priya K.', loc: 'Birmingham', text: "Seeing my net worth grow each month is genuinely motivating. The goals feature keeps me focused.", img: person3 },
+              { name: 'Sarah M.', loc: 'London', text: "I finally feel in control of my money. The AI chat is like having a financial adviser in my pocket.", initials: 'SM' },
+              { name: 'James T.', loc: 'Manchester', text: "Pulse caught me overspending on subscriptions and showed me which to cancel. Saved £40 a month.", initials: 'JT' },
+              { name: 'Priya K.', loc: 'Birmingham', text: "Seeing my net worth grow each month is genuinely motivating. The goals feature keeps me focused.", initials: 'PK' },
             ].map((t) => (
               <div key={t.name} className="bg-white rounded-2xl p-6 border border-gray-100" style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>
                 <div className="flex gap-0.5 mb-3">
@@ -311,7 +312,7 @@ export default function LandingPage() {
                 </div>
                 <p className="text-sm text-[#111827] leading-relaxed mb-4">{t.text}</p>
                 <div className="flex items-center gap-3">
-                  <img src={t.img} alt={t.name} className="w-10 h-10 rounded-full object-cover" loading="lazy" width={40} height={40} />
+                  <div className="w-10 h-10 rounded-full bg-[#5B5BD6] flex items-center justify-center text-white text-xs font-bold">{t.initials}</div>
                   <div>
                     <div className="text-sm font-semibold text-[#111827]">{t.name}</div>
                     <div className="text-xs text-[#6B7280]">{t.loc}</div>
@@ -356,7 +357,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-[#1E1B4B] border-t border-white/10 text-white py-12 sm:py-16">
+      <footer className="bg-[#0F0F23] border-t border-white/10 text-white py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 sm:col-span-1">
