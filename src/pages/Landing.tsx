@@ -119,7 +119,7 @@ export default function LandingPage() {
        <Section className="py-12 sm:py-20 bg-gradient-to-br from-[#1E1B4B] to-[#5B5BD6]">
          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
            {/* Top row: lifestyle image + hero text */}
-           <div className="grid md:grid-cols-2 gap-8 items-center">
+           <div className="grid md:grid-cols-2 gap-8 items-start">
              <div className="max-w-sm mx-auto md:mx-0">
                <div className="rounded-3xl overflow-hidden shadow-xl">
                  <img src={lifestyle1} alt="Woman using Sonfi app on her phone to manage finances" className="w-full h-auto object-cover" loading="lazy" />
@@ -138,13 +138,13 @@ export default function LandingPage() {
                >
                  Get started free <ArrowRight size={16} />
                </Link>
+               {/* Budgets laptop mockup under hero text */}
+               <div className="mt-6 max-w-sm">
+                 <LaptopMockup>
+                   <img src={budgetsScreenshot} alt="Sonfi Budgets page" className="w-full h-full object-cover object-top" />
+                 </LaptopMockup>
+               </div>
              </div>
-           </div>
-           {/* Budgets laptop mockup below */}
-           <div className="mt-10 max-w-2xl mx-auto">
-             <LaptopMockup>
-               <img src={budgetsScreenshot} alt="Sonfi Budgets page" className="w-full h-full object-cover object-top" />
-             </LaptopMockup>
            </div>
          </div>
        </Section>
