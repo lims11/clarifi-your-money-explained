@@ -6,6 +6,7 @@ import { DashboardWebMockup, DashboardMobileMockup } from '@/components/landing/
 import { ChatMockup, PulseMockup, CreditScoreMockup } from '@/components/landing/FeatureMockups';
 import { BudgetsWebMockup, AccountsWebMockup, ScheduledWebMockup, PulseWebMockup } from '@/components/landing/WebMockups';
 import { useScrollReveal } from '@/components/landing/useScrollReveal';
+import logoHorizontal from '@/assets/sonfi-logo-horizontal.png';
 
 function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
   const { ref, visible } = useScrollReveal();
@@ -26,7 +27,7 @@ export default function LandingPage() {
       <LandingNav />
 
       {/* ── HERO ── */}
-      <section className="relative bg-[#0F0F1A] overflow-hidden pt-16">
+      <section className="relative bg-[#1E1B4B] overflow-hidden pt-16">
         <div className="absolute top-1/2 right-1/3 w-[600px] h-[600px] bg-[#5B5BD6] rounded-full opacity-[0.08] blur-[200px]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -34,10 +35,12 @@ export default function LandingPage() {
               <div className="text-[#5B5BD6] text-xs font-bold tracking-[0.2em] uppercase mb-4">
                 Your finances. Finally clear.
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-[56px] font-extrabold text-white leading-[1.1] tracking-tight">
-                The smart money app<br className="hidden sm:block" /> that actually thinks<br className="hidden sm:block" /> with you.
+              <h1 className="text-3xl sm:text-4xl lg:text-[56px] font-extrabold text-white leading-[1.15] tracking-tight">
+                <span className="block mb-2">The smart money app</span>
+                <span className="block mb-2">that actually thinks</span>
+                <span className="block">with you.</span>
               </h1>
-              <p className="mt-5 text-base sm:text-lg text-[#9CA3AF] leading-relaxed max-w-lg mx-auto lg:mx-0">
+              <p className="mt-6 text-base sm:text-lg text-[#C4B5FD] leading-relaxed max-w-lg mx-auto lg:mx-0">
                 Connect all your accounts, track every penny, crush your goals — with an AI that knows your finances better than you do.
               </p>
               <div className="mt-8 flex flex-wrap gap-3 justify-center lg:justify-start">
@@ -54,7 +57,7 @@ export default function LandingPage() {
                   See how it works
                 </a>
               </div>
-              <div className="mt-5 flex flex-wrap gap-4 justify-center lg:justify-start text-[11px] text-[#6B7280]">
+              <div className="mt-5 flex flex-wrap gap-4 justify-center lg:justify-start text-[11px] text-[#A78BFA]">
                 <span className="flex items-center gap-1"><Shield size={12} /> Bank-level security</span>
                 <span>Free plan available</span>
                 <span>Open Banking powered</span>
@@ -68,7 +71,7 @@ export default function LandingPage() {
                   <DashboardWebMockup />
                 </LaptopMockup>
               </div>
-              <div className="absolute -bottom-8 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
+              <div className="absolute -bottom-4 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
                 <PhoneMockup>
                   <DashboardMobileMockup />
                 </PhoneMockup>
@@ -89,7 +92,7 @@ export default function LandingPage() {
         <div className="border-t border-white/5 py-4">
           <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-3 justify-center">
             {['Open Banking', 'Experian Credit Data', '256-bit Encryption', 'UK Regulated'].map((b) => (
-              <span key={b} className="text-[10px] text-[#6B7280] border border-white/10 rounded-full px-3 py-1">
+              <span key={b} className="text-[10px] text-[#A78BFA] border border-white/10 rounded-full px-3 py-1">
                 {b}
               </span>
             ))}
@@ -267,22 +270,6 @@ export default function LandingPage() {
         </Section>
       </div>
 
-      {/* ── STATS ── */}
-      <Section className="bg-[#1E1B4B] py-16">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-3 gap-6 text-center">
-          {[
-            { value: '£29,623', label: 'Average net worth tracked' },
-            { value: '34%', label: 'Average savings rate' },
-            { value: '8', label: 'Accounts per user' },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">{s.value}</div>
-              <div className="text-[10px] sm:text-sm text-[#9CA3AF] mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </Section>
-
       {/* ── TESTIMONIALS ── */}
       <Section className="bg-white py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4">
@@ -312,12 +299,12 @@ export default function LandingPage() {
       </Section>
 
       {/* ── FINAL CTA ── */}
-      <Section className="bg-[#0F0F1A] py-16 sm:py-24">
+      <Section className="bg-[#1E1B4B] py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-[48px] font-extrabold text-white tracking-tight leading-tight mb-5">
             Take control of your<br />financial life today.
           </h2>
-          <p className="text-[#9CA3AF] mb-8">Free to start. No card needed. Takes 3 minutes.</p>
+          <p className="text-[#C4B5FD] mb-8">Free to start. No card needed. Takes 3 minutes.</p>
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             <Link
               to="/login?tab=signup"
@@ -344,12 +331,12 @@ export default function LandingPage() {
       </Section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-[#111827] text-white py-12 sm:py-16">
+      <footer className="bg-[#1E1B4B] border-t border-white/10 text-white py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 sm:col-span-1">
-              <div className="font-extrabold text-xl tracking-tight mb-3">SONFI</div>
-              <p className="text-sm text-[#9CA3AF] mb-4">Your smart money companion.</p>
+              <img src={logoHorizontal} alt="Sonfi" className="h-6 mb-3 brightness-0 invert" />
+              <p className="text-sm text-[#C4B5FD] mb-4">Your smart money companion.</p>
               <div className="flex gap-3">
                 {['𝕏', 'in', '📸'].map((s) => (
                   <div key={s} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs text-white/70 hover:bg-white/20 transition-colors cursor-pointer">
@@ -359,31 +346,31 @@ export default function LandingPage() {
               </div>
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3">Product</div>
-              <ul className="space-y-2 text-sm text-[#9CA3AF]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#A78BFA] mb-3">Product</div>
+              <ul className="space-y-2 text-sm text-[#C4B5FD]">
                 {['Features', 'Pricing', 'Credit Score', 'Pulse'].map((l) => (
                   <li key={l}><a href={l === 'Pricing' ? '/pricing' : '#'} className="hover:text-white transition-colors">{l}</a></li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3">Company</div>
-              <ul className="space-y-2 text-sm text-[#9CA3AF]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#A78BFA] mb-3">Company</div>
+              <ul className="space-y-2 text-sm text-[#C4B5FD]">
                 {['About', 'Blog', 'Careers', 'Press'].map((l) => (
                   <li key={l}><a href="#" className="hover:text-white transition-colors">{l}</a></li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3">Legal</div>
-              <ul className="space-y-2 text-sm text-[#9CA3AF]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#A78BFA] mb-3">Legal</div>
+              <ul className="space-y-2 text-sm text-[#C4B5FD]">
                 {['Privacy Policy', 'Terms of Service', 'Cookie Settings', 'Security'].map((l) => (
                   <li key={l}><a href="#" className="hover:text-white transition-colors">{l}</a></li>
                 ))}
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/10 pt-6 text-xs text-[#6B7280] text-center leading-relaxed">
+          <div className="border-t border-white/10 pt-6 text-xs text-[#A78BFA] text-center leading-relaxed">
             © 2025 Sonfi Ltd. Sonfi is not a lender or credit broker. Powered by Experian. Open Banking authorised. All figures shown are illustrative.
           </div>
         </div>
