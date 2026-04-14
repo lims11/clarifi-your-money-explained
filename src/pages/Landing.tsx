@@ -6,7 +6,10 @@ import { DashboardWebMockup, DashboardMobileMockup } from '@/components/landing/
 import { ChatMockup, PulseMockup, CreditScoreMockup } from '@/components/landing/FeatureMockups';
 import { BudgetsWebMockup, AccountsWebMockup, ScheduledWebMockup, PulseWebMockup } from '@/components/landing/WebMockups';
 import { useScrollReveal } from '@/components/landing/useScrollReveal';
-import logoHorizontal from '@/assets/sonfi-logo-horizontal.png';
+import logoFooter from '@/assets/sonfi-logo-horizontal-dark.png';
+import person1 from '@/assets/landing-person-1.jpg';
+import person2 from '@/assets/landing-person-2.jpg';
+import person3 from '@/assets/landing-person-3.jpg';
 
 function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
   const { ref, visible } = useScrollReveal();
