@@ -74,10 +74,8 @@ export default function LandingPage() {
                   <DashboardWebMockup />
                 </LaptopMockup>
               </div>
-              <div className="absolute -bottom-10 -left-4 lg:-left-8 w-[148px] sm:w-[168px] animate-float-delayed z-10">
-                <PhoneMockup>
-                  <DashboardMobileMockup />
-                </PhoneMockup>
+              <div className="absolute -bottom-10 -left-4 lg:-left-8 w-[180px] sm:w-[210px] animate-float-delayed z-10">
+                <img src={phoneMockupImg} alt="Sonfi mobile app" className="w-full h-auto drop-shadow-2xl" />
               </div>
             </div>
             {/* Mobile-only hero mockup */}
