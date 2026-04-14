@@ -73,7 +73,7 @@ export default function LandingPage() {
                   <DashboardWebMockup />
                 </LaptopMockup>
               </div>
-              <div className="absolute -bottom-4 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
+              <div className="absolute -bottom-2 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
                 <PhoneMockup>
                   <DashboardMobileMockup />
                 </PhoneMockup>
@@ -355,7 +355,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-[#1E1B4B] border-t border-white/10 text-white py-12 sm:py-16">
+      <footer className="bg-[#0F0F23] border-t border-white/10 text-white py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 sm:col-span-1">
