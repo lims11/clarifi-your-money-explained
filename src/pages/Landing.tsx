@@ -6,7 +6,10 @@ import { DashboardWebMockup, DashboardMobileMockup } from '@/components/landing/
 import { ChatMockup, PulseMockup, CreditScoreMockup } from '@/components/landing/FeatureMockups';
 import { BudgetsWebMockup, AccountsWebMockup, ScheduledWebMockup, PulseWebMockup } from '@/components/landing/WebMockups';
 import { useScrollReveal } from '@/components/landing/useScrollReveal';
-import logoHorizontal from '@/assets/sonfi-logo-horizontal.png';
+import logoFooter from '@/assets/sonfi-logo-horizontal-dark.png';
+import person1 from '@/assets/landing-person-1.jpg';
+import person2 from '@/assets/landing-person-2.jpg';
+import person3 from '@/assets/landing-person-3.jpg';
 
 function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
   const { ref, visible } = useScrollReveal();
@@ -110,6 +113,24 @@ export default function LandingPage() {
             ))}
             <span className="text-sm font-medium text-[#111827] ml-2">4.8 / 5 from early users</span>
           </div>
+        </div>
+      </Section>
+
+      {/* ── LIFESTYLE BANNER ── */}
+      <Section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-3 gap-4 sm:gap-6">
+            <div className="rounded-2xl overflow-hidden aspect-square">
+              <img src={person1} alt="Woman managing finances on phone" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
+            </div>
+            <div className="rounded-2xl overflow-hidden aspect-square">
+              <img src={person2} alt="Man reviewing budget on laptop" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
+            </div>
+            <div className="rounded-2xl overflow-hidden aspect-square">
+              <img src={person3} alt="Couple planning finances together" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
+            </div>
+          </div>
+          <p className="text-center text-[#6B7280] text-sm mt-6">Trusted by thousands across the UK to manage their money smarter.</p>
         </div>
       </Section>
 
@@ -278,20 +299,24 @@ export default function LandingPage() {
           </h2>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { name: 'Sarah M.', loc: 'London', text: "I finally feel in control of my money. The AI chat is like having a financial adviser in my pocket." },
-              { name: 'James T.', loc: 'Manchester', text: "Pulse caught me overspending on subscriptions and showed me which to cancel. Saved £40 a month." },
-              { name: 'Priya K.', loc: 'Birmingham', text: "Seeing my net worth grow each month is genuinely motivating. The goals feature keeps me focused." },
+              { name: 'Sarah M.', loc: 'London', text: "I finally feel in control of my money. The AI chat is like having a financial adviser in my pocket.", img: person1 },
+              { name: 'James T.', loc: 'Manchester', text: "Pulse caught me overspending on subscriptions and showed me which to cancel. Saved £40 a month.", img: person2 },
+              { name: 'Priya K.', loc: 'Birmingham', text: "Seeing my net worth grow each month is genuinely motivating. The goals feature keeps me focused.", img: person3 },
             ].map((t) => (
               <div key={t.name} className="bg-white rounded-2xl p-6 border border-gray-100" style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>
-                <div className="text-[#5B5BD6] text-3xl font-serif mb-3">"</div>
                 <div className="flex gap-0.5 mb-3">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
                   ))}
                 </div>
                 <p className="text-sm text-[#111827] leading-relaxed mb-4">{t.text}</p>
-                <div className="text-sm font-semibold text-[#111827]">{t.name}</div>
-                <div className="text-xs text-[#6B7280]">{t.loc}</div>
+                <div className="flex items-center gap-3">
+                  <img src={t.img} alt={t.name} className="w-10 h-10 rounded-full object-cover" loading="lazy" width={40} height={40} />
+                  <div>
+                    <div className="text-sm font-semibold text-[#111827]">{t.name}</div>
+                    <div className="text-xs text-[#6B7280]">{t.loc}</div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -335,7 +360,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 sm:col-span-1">
-              <img src={logoHorizontal} alt="Sonfi" className="h-6 mb-3 brightness-0 invert" />
+              <img src={logoFooter} alt="Sonfi" className="h-8 mb-3" />
               <p className="text-sm text-[#C4B5FD] mb-4">Your smart money companion.</p>
               <div className="flex gap-3">
                 {['𝕏', 'in', '📸'].map((s) => (
