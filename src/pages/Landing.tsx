@@ -357,46 +357,46 @@ export default function LandingPage() {
       </Section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-[#0F0F23] border-t border-white/10 text-white py-12 sm:py-16">
+      <footer className="bg-[#E8E5F5] border-t border-[#D6D0EC] text-[#1E1B4B] py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 sm:col-span-1">
               <img src={logoFooter} alt="Sonfi" className="h-8 mb-3" />
-              <p className="text-sm text-[#C4B5FD] mb-4">Your smart money companion.</p>
+              <p className="text-sm text-[#5B5BD6] mb-4">Your smart money companion.</p>
               <div className="flex gap-3">
                 {['𝕏', 'in', '📸'].map((s) => (
-                  <div key={s} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs text-white/70 hover:bg-white/20 transition-colors cursor-pointer">
+                  <div key={s} className="w-8 h-8 rounded-full bg-[#1E1B4B]/10 flex items-center justify-center text-xs text-[#1E1B4B]/70 hover:bg-[#1E1B4B]/20 transition-colors cursor-pointer">
                     {s}
                   </div>
                 ))}
               </div>
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#A78BFA] mb-3">Product</div>
-              <ul className="space-y-2 text-sm text-[#C4B5FD]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#5B5BD6] mb-3">Product</div>
+              <ul className="space-y-2 text-sm text-[#1E1B4B]/70">
                 {['Features', 'Pricing', 'Credit Score', 'Pulse'].map((l) => (
-                  <li key={l}><a href={l === 'Pricing' ? '/pricing' : '#'} className="hover:text-white transition-colors">{l}</a></li>
+                  <li key={l}><a href={l === 'Pricing' ? '/pricing' : '#'} className="hover:text-[#1E1B4B] transition-colors">{l}</a></li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#A78BFA] mb-3">Company</div>
-              <ul className="space-y-2 text-sm text-[#C4B5FD]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#5B5BD6] mb-3">Company</div>
+              <ul className="space-y-2 text-sm text-[#1E1B4B]/70">
                 {['About', 'Blog', 'Careers', 'Press'].map((l) => (
-                  <li key={l}><a href="#" className="hover:text-white transition-colors">{l}</a></li>
+                  <li key={l}><a href="#" className="hover:text-[#1E1B4B] transition-colors">{l}</a></li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#A78BFA] mb-3">Legal</div>
-              <ul className="space-y-2 text-sm text-[#C4B5FD]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#5B5BD6] mb-3">Legal</div>
+              <ul className="space-y-2 text-sm text-[#1E1B4B]/70">
                 {['Privacy Policy', 'Terms of Service', 'Cookie Settings', 'Security'].map((l) => (
-                  <li key={l}><a href="#" className="hover:text-white transition-colors">{l}</a></li>
+                  <li key={l}><a href="#" className="hover:text-[#1E1B4B] transition-colors">{l}</a></li>
                 ))}
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/10 pt-6 text-xs text-[#A78BFA] text-center leading-relaxed">
+          <div className="border-t border-[#1E1B4B]/10 pt-6 text-xs text-[#5B5BD6] text-center leading-relaxed">
             © 2025 Sonfi Ltd. Sonfi is not a lender or credit broker. Powered by Experian. Open Banking authorised. All figures shown are illustrative.
           </div>
         </div>
