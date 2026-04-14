@@ -116,6 +116,24 @@ export default function LandingPage() {
         </div>
       </Section>
 
+      {/* ── LIFESTYLE BANNER ── */}
+      <Section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-3 gap-4 sm:gap-6">
+            <div className="rounded-2xl overflow-hidden aspect-square">
+              <img src={person1} alt="Woman managing finances on phone" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
+            </div>
+            <div className="rounded-2xl overflow-hidden aspect-square">
+              <img src={person2} alt="Man reviewing budget on laptop" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
+            </div>
+            <div className="rounded-2xl overflow-hidden aspect-square">
+              <img src={person3} alt="Couple planning finances together" className="w-full h-full object-cover" loading="lazy" width={800} height={800} />
+            </div>
+          </div>
+          <p className="text-center text-[#6B7280] text-sm mt-6">Trusted by thousands across the UK to manage their money smarter.</p>
+        </div>
+      </Section>
+
       {/* ── FEATURES — Only 3 core features ── */}
       <div id="features" className="py-16 sm:py-24">
         {/* Feature 1: AI Chat — the hero differentiator */}
