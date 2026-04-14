@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Check, ArrowRight, Shield } from 'lucide-react';
-import LandingNav from '@/components/landing/LandingNav';
+import { Check, Shield } from 'lucide-react';
+import LandingPageShell from '@/components/landing/LandingPageShell';
 
 export default function PricingPage() {
   const plans = [
@@ -60,10 +60,8 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <LandingNav />
-
-      <div className="pt-28 pb-20 px-4">
+    <LandingPageShell>
+      <div className="py-12 sm:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] tracking-tight mb-4">
@@ -125,16 +123,6 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-[#111827] text-white py-10">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <div className="font-extrabold text-lg tracking-tight mb-2">SONFI</div>
-          <div className="text-xs text-[#6B7280]">
-            © 2025 Sonfi Ltd. All figures shown are illustrative.
-          </div>
-        </div>
-      </footer>
-    </div>
+    </LandingPageShell>
   );
 }
