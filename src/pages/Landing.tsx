@@ -115,37 +115,36 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── LIFESTYLE IMAGE 1 + HERO MESSAGE ── */}
-      <Section className="py-12 sm:py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+       {/* ── LIFESTYLE IMAGE 1 + HERO MESSAGE ── */}
+       <Section className="py-12 sm:py-20 bg-gradient-to-br from-[#1E1B4B] to-[#5B5BD6]">
+         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+           {/* Top row: lifestyle image + hero text */}
            <div className="grid md:grid-cols-2 gap-8 items-center">
-             <div className="space-y-6">
-               <div className="max-w-sm mx-auto md:mx-0">
-                 <div className="rounded-3xl overflow-hidden shadow-xl">
-                   <img src={lifestyle1} alt="Woman using Sonfi app on her phone to manage finances" className="w-full h-auto object-cover" loading="lazy" />
-                 </div>
-               </div>
-               {/* Budgets in laptop mockup */}
-               <div className="max-w-md mx-auto md:mx-0">
-                 <LaptopMockup>
-                   <img src={budgetsScreenshot} alt="Sonfi Budgets page" className="w-full h-full object-cover object-top" />
-                 </LaptopMockup>
+             <div className="max-w-sm mx-auto md:mx-0">
+               <div className="rounded-3xl overflow-hidden shadow-xl">
+                 <img src={lifestyle1} alt="Woman using Sonfi app on her phone to manage finances" className="w-full h-auto object-cover" loading="lazy" />
                </div>
              </div>
-              <div className="bg-gradient-to-br from-[#1E1B4B] to-[#5B5BD6] rounded-3xl p-8 sm:p-12 text-white">
-                <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight mb-4">
-                  Your money, finally working for you.
-                </h2>
-                <p className="text-[#C4B5FD] text-base sm:text-lg leading-relaxed mb-6">
-                  Connect all your accounts in one place. Get AI-powered insights that help you save more, spend smarter, and reach your goals faster.
-                </p>
-                <Link
-                  to="/login?tab=signup"
-                  className="inline-flex items-center gap-2 bg-white text-[#1E1B4B] font-semibold px-6 py-3 rounded-full hover:bg-[#C4B5FD] transition-all text-sm"
-                >
-                  Get started free <ArrowRight size={16} />
-                </Link>
-              </div>
+             <div className="text-white">
+               <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight mb-4">
+                 Your money, finally working for you.
+               </h2>
+               <p className="text-[#C4B5FD] text-base sm:text-lg leading-relaxed mb-6">
+                 Connect all your accounts in one place. Get AI-powered insights that help you save more, spend smarter, and reach your goals faster.
+               </p>
+               <Link
+                 to="/login?tab=signup"
+                 className="inline-flex items-center gap-2 bg-white text-[#1E1B4B] font-semibold px-6 py-3 rounded-full hover:bg-[#C4B5FD] transition-all text-sm"
+               >
+                 Get started free <ArrowRight size={16} />
+               </Link>
+             </div>
+           </div>
+           {/* Budgets laptop mockup below */}
+           <div className="mt-10 max-w-2xl mx-auto">
+             <LaptopMockup>
+               <img src={budgetsScreenshot} alt="Sonfi Budgets page" className="w-full h-full object-cover object-top" />
+             </LaptopMockup>
            </div>
          </div>
        </Section>
