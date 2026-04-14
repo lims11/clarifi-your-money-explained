@@ -21,6 +21,17 @@ import Settings from "./pages/Settings";
 import Scheduled from "./pages/Scheduled";
 import Offers from "./pages/Offers";
 import Pricing from "./pages/Pricing";
+import Features from "./pages/Features";
+import CreditScoreInfo from "./pages/CreditScoreInfo";
+import PulseInfo from "./pages/PulseInfo";
+import About from "./pages/About";
+import Blog from "./pages/Blog";
+import Careers from "./pages/Careers";
+import Press from "./pages/Press";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Cookies from "./pages/Cookies";
+import SecurityPage from "./pages/Security";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +46,17 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/credit-score" element={<CreditScoreInfo />} />
+            <Route path="/pulse-info" element={<PulseInfo />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/press" element={<Press />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/cookies" element={<Cookies />} />
+            <Route path="/security" element={<SecurityPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/onboarding" element={<ProtectedRoute requireAuth={true}><Onboarding /></ProtectedRoute>} />
 
