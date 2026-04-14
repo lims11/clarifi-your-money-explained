@@ -338,7 +338,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 sm:col-span-1">
-              <img src={logoHorizontal} alt="Sonfi" className="h-6 mb-3 brightness-0 invert" />
+              <img src={logoFooter} alt="Sonfi" className="h-8 mb-3" />
               <p className="text-sm text-[#C4B5FD] mb-4">Your smart money companion.</p>
               <div className="flex gap-3">
                 {['𝕏', 'in', '📸'].map((s) => (
