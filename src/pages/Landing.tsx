@@ -175,33 +175,97 @@ export default function LandingPage() {
         </Section>
       </div>
 
-      {/* ── EVERYTHING ELSE — Feature grid ── */}
-      <Section className="bg-[#F8F9FC] py-16 sm:py-24">
-        <div className="max-w-7xl mx-auto px-4">
+      {/* ── LAPTOP SHOWCASES ── */}
+      <div className="bg-[#F8F9FC] py-16 sm:py-24 space-y-16 sm:space-y-24">
+        <Section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight mb-3">
               Everything you need, nothing you don't.
             </h2>
             <p className="text-[#6B7280] max-w-xl mx-auto">All your finances in one beautiful, intelligent app.</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: '📊', title: 'Net Worth Dashboard', desc: 'See assets, liabilities and your complete financial picture updated in real time.' },
-              { icon: '🎯', title: 'Smart Budgets', desc: 'Auto-tracking budgets that warn you before you overspend. See planned vs actual instantly.' },
-              { icon: '🏦', title: 'All Accounts', desc: 'Barclays, Monzo, Starling, Chase — connect hundreds of banks via Open Banking.' },
-              { icon: '💰', title: 'Savings Goals', desc: 'Set targets, track progress, and know exactly how much to save each month.' },
-              { icon: '📅', title: 'Bill Calendar', desc: 'Never miss a payment. See all recurring bills and income on one calendar.' },
-              { icon: '🎁', title: 'Smart Offers', desc: 'Personalised offers to save money on credit cards, loans, and more.' },
-            ].map((f) => (
-              <div key={f.title} className="bg-white rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300" style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.04)' }}>
-                <div className="text-2xl mb-3">{f.icon}</div>
-                <h3 className="font-bold text-[#111827] mb-2">{f.title}</h3>
-                <p className="text-sm text-[#6B7280] leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
+        </Section>
+
+        {/* Budgets — laptop */}
+        <Section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div>
+              <LaptopMockup className="max-w-[520px] mx-auto transform lg:-rotate-1 hover:rotate-0 transition-transform duration-500">
+                <BudgetsWebMockup />
+              </LaptopMockup>
+            </div>
+            <div>
+              <span className="inline-block bg-[#5B5BD6]/10 text-[#5B5BD6] text-xs font-semibold px-4 py-1.5 rounded-full mb-4">🎯 Budgets</span>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight mb-3">
+                Budgets that track themselves.
+              </h3>
+              <p className="text-[#6B7280] leading-relaxed">
+                Set budgets for every category. See planned vs actual in real time, with your savings rate calculated automatically. Get warned before month-end surprises hit.
+              </p>
+            </div>
           </div>
-        </div>
-      </Section>
+        </Section>
+
+        {/* Accounts — laptop */}
+        <Section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">🏦 Accounts</span>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight mb-3">
+                All your accounts. One clean view.
+              </h3>
+              <p className="text-[#6B7280] leading-relaxed">
+                Barclays, Monzo, Starling, Chase, Marcus — connect hundreds of banks via Open Banking. See balances, sparklines and transaction flows for every account.
+              </p>
+            </div>
+            <div className="order-1 lg:order-2">
+              <LaptopMockup className="max-w-[520px] mx-auto transform lg:rotate-1 hover:rotate-0 transition-transform duration-500">
+                <AccountsWebMockup />
+              </LaptopMockup>
+            </div>
+          </div>
+        </Section>
+
+        {/* Pulse — laptop */}
+        <Section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div>
+              <LaptopMockup className="max-w-[520px] mx-auto transform lg:-rotate-1 hover:rotate-0 transition-transform duration-500">
+                <PulseWebMockup />
+              </LaptopMockup>
+            </div>
+            <div>
+              <span className="inline-block bg-amber-100 text-amber-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">💡 Pulse</span>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight mb-3">
+                Warnings, tips and wins — automatically.
+              </h3>
+              <p className="text-[#6B7280] leading-relaxed">
+                Sonfi proactively surfaces insights based on your spending patterns. From overspending alerts to money-saving tips — without you having to ask.
+              </p>
+            </div>
+          </div>
+        </Section>
+
+        {/* Scheduled — laptop */}
+        <Section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <span className="inline-block bg-green-100 text-green-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">📅 Bills</span>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight mb-3">
+                Never miss a bill again.
+              </h3>
+              <p className="text-[#6B7280] leading-relaxed">
+                See all your recurring bills, subscriptions and income on a calendar. Know your net monthly position at a glance — Rent, Netflix, Spotify, all in one place.
+              </p>
+            </div>
+            <div className="order-1 lg:order-2">
+              <LaptopMockup className="max-w-[520px] mx-auto transform lg:rotate-1 hover:rotate-0 transition-transform duration-500">
+                <ScheduledWebMockup />
+              </LaptopMockup>
+            </div>
+          </div>
+        </Section>
+      </div>
 
       {/* ── STATS ── */}
       <Section className="bg-[#1E1B4B] py-16">
