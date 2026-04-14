@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import logoHorizontal from '@/assets/logo-horizontal.png';
 import { Star, Shield, ArrowRight } from 'lucide-react';
 import LandingNav from '@/components/landing/LandingNav';
 import { LaptopMockup, PhoneMockup } from '@/components/landing/DeviceMockups';
