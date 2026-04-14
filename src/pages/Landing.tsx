@@ -73,7 +73,7 @@ export default function LandingPage() {
                   <DashboardWebMockup />
                 </LaptopMockup>
               </div>
-              <div className="absolute -bottom-2 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
+              <div className="absolute bottom-4 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
                 <PhoneMockup>
                   <DashboardMobileMockup />
                 </PhoneMockup>
@@ -116,8 +116,8 @@ export default function LandingPage() {
       </Section>
 
       {/* ── LIFESTYLE IMAGE 1 ── */}
-      <Section className="py-16 sm:py-24 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Section className="py-12 sm:py-20 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl overflow-hidden shadow-xl">
             <img src={lifestyle1} alt="Woman using Sonfi app on her phone to manage finances" className="w-full h-auto object-cover" loading="lazy" />
           </div>
