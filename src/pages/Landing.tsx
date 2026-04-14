@@ -73,7 +73,7 @@ export default function LandingPage() {
                   <DashboardWebMockup />
                 </LaptopMockup>
               </div>
-              <div className="absolute -bottom-8 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
+              <div className="absolute -bottom-10 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
                 <PhoneMockup>
                   <DashboardMobileMockup />
                 </PhoneMockup>
