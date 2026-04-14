@@ -22,9 +22,9 @@ export function LaptopMockup({ children, className = '' }: { children: ReactNode
 export function PhoneMockup({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <div className={`relative ${className}`}>
-      <div className="bg-[#1a1a1a] rounded-[2rem] p-2 shadow-2xl">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-[#1a1a1a] rounded-b-2xl z-10" />
-        <div className="bg-white rounded-[1.5rem] overflow-hidden relative">
+      <div className="bg-[#1a1a1a] rounded-[1.8rem] p-1.5 shadow-2xl">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-[#1a1a1a] rounded-b-2xl z-10" />
+        <div className="bg-white rounded-[1.35rem] overflow-hidden relative">
           {children}
         </div>
       </div>
