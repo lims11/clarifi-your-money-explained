@@ -100,7 +100,7 @@ export function DashboardWebMockup() {
 
 export function DashboardMobileMockup() {
   return (
-    <div className="bg-[#F8F9FC] p-3 text-[11px]" style={{ minHeight: 400 }}>
+    <div className="bg-[#F8F9FC] p-3 text-[11px]" style={{ minHeight: 360 }}>
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="text-gray-800 font-semibold text-sm">Good morning, Kim 👋</div>
