@@ -1,8 +1,4 @@
 import { Link } from 'react-router-dom';
-import logoHorizontal from '@/assets/logo-horizontal.png';
-import landingDashboard from '@/assets/landing-dashboard.jpg';
-import landingChat from '@/assets/landing-chat.jpg';
-import landingBudgets from '@/assets/landing-budgets.jpg';
 import { Star, Shield, ArrowRight } from 'lucide-react';
 import LandingNav from '@/components/landing/LandingNav';
 import { LaptopMockup, PhoneMockup } from '@/components/landing/DeviceMockups';
@@ -69,7 +65,7 @@ export default function LandingPage() {
             <div className="relative hidden md:block">
               <div className="animate-float">
                 <LaptopMockup className="w-full max-w-[560px] mx-auto">
-                  <img src={landingDashboard} alt="Sonfi Dashboard" className="w-full" />
+                  <DashboardWebMockup />
                 </LaptopMockup>
               </div>
               <div className="absolute -bottom-8 -left-4 lg:-left-8 w-[160px] sm:w-[180px] animate-float-delayed z-10">
@@ -128,9 +124,9 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="flex justify-center">
-            <div className="w-[260px] sm:w-[300px] transform hover:scale-[1.02] transition-transform duration-500">
+            <div className="w-[240px] sm:w-[280px] transform hover:scale-[1.02] transition-transform duration-500">
               <PhoneMockup>
-                <img src={landingChat} alt="Sonfi AI Chat" className="w-full" loading="lazy" />
+                <ChatMockup />
               </PhoneMockup>
             </div>
           </div>
@@ -195,7 +191,7 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
               <LaptopMockup className="max-w-[520px] mx-auto transform lg:-rotate-1 hover:rotate-0 transition-transform duration-500">
-                <img src={landingBudgets} alt="Sonfi Budgets" className="w-full" loading="lazy" />
+                <BudgetsWebMockup />
               </LaptopMockup>
             </div>
             <div>
@@ -352,7 +348,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 sm:col-span-1">
-              <img src={logoHorizontal} alt="Sonfi" className="h-7 mb-3 brightness-0 invert" />
+              <div className="font-extrabold text-xl tracking-tight mb-3">SONFI</div>
               <p className="text-sm text-[#9CA3AF] mb-4">Your smart money companion.</p>
               <div className="flex gap-3">
                 {['𝕏', 'in', '📸'].map((s) => (
