@@ -139,7 +139,7 @@ export default function LandingPage() {
                  Get started free <ArrowRight size={16} />
                </Link>
                {/* Budgets laptop mockup under hero text */}
-               <div className="mt-6 max-w-sm">
+               <div className="mt-6 max-w-md">
                  <LaptopMockup>
                    <img src={budgetsScreenshot} alt="Sonfi Budgets page" className="w-full h-full object-cover object-top" />
                  </LaptopMockup>
