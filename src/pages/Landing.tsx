@@ -299,20 +299,24 @@ export default function LandingPage() {
           </h2>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { name: 'Sarah M.', loc: 'London', text: "I finally feel in control of my money. The AI chat is like having a financial adviser in my pocket." },
-              { name: 'James T.', loc: 'Manchester', text: "Pulse caught me overspending on subscriptions and showed me which to cancel. Saved £40 a month." },
-              { name: 'Priya K.', loc: 'Birmingham', text: "Seeing my net worth grow each month is genuinely motivating. The goals feature keeps me focused." },
+              { name: 'Sarah M.', loc: 'London', text: "I finally feel in control of my money. The AI chat is like having a financial adviser in my pocket.", img: person1 },
+              { name: 'James T.', loc: 'Manchester', text: "Pulse caught me overspending on subscriptions and showed me which to cancel. Saved £40 a month.", img: person2 },
+              { name: 'Priya K.', loc: 'Birmingham', text: "Seeing my net worth grow each month is genuinely motivating. The goals feature keeps me focused.", img: person3 },
             ].map((t) => (
               <div key={t.name} className="bg-white rounded-2xl p-6 border border-gray-100" style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>
-                <div className="text-[#5B5BD6] text-3xl font-serif mb-3">"</div>
                 <div className="flex gap-0.5 mb-3">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
                   ))}
                 </div>
                 <p className="text-sm text-[#111827] leading-relaxed mb-4">{t.text}</p>
-                <div className="text-sm font-semibold text-[#111827]">{t.name}</div>
-                <div className="text-xs text-[#6B7280]">{t.loc}</div>
+                <div className="flex items-center gap-3">
+                  <img src={t.img} alt={t.name} className="w-10 h-10 rounded-full object-cover" loading="lazy" width={40} height={40} />
+                  <div>
+                    <div className="text-sm font-semibold text-[#111827]">{t.name}</div>
+                    <div className="text-xs text-[#6B7280]">{t.loc}</div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
