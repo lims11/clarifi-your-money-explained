@@ -123,23 +123,27 @@ export default function LandingPage() {
                 <img src={lifestyle1} alt="Woman using Sonfi app on her phone to manage finances" className="w-full h-auto object-cover" loading="lazy" />
               </div>
             </div>
-            <div className="bg-gradient-to-br from-[#1E1B4B] to-[#5B5BD6] rounded-3xl p-8 sm:p-12 text-white">
-              <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight mb-4">
-                Your money, finally working for you.
-              </h2>
-              <p className="text-[#C4B5FD] text-base sm:text-lg leading-relaxed mb-6">
-                Connect all your accounts in one place. Get AI-powered insights that help you save more, spend smarter, and reach your goals faster.
-              </p>
-              <Link
-                to="/login?tab=signup"
-                className="inline-flex items-center gap-2 bg-white text-[#1E1B4B] font-semibold px-6 py-3 rounded-full hover:bg-[#C4B5FD] transition-all text-sm"
-              >
-                Get started free <ArrowRight size={16} />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </Section>
+             <div className="bg-gradient-to-br from-[#1E1B4B] to-[#5B5BD6] rounded-3xl p-8 sm:p-12 text-white">
+               <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight mb-4">
+                 Your money, finally working for you.
+               </h2>
+               <p className="text-[#C4B5FD] text-base sm:text-lg leading-relaxed mb-6">
+                 Connect all your accounts in one place. Get AI-powered insights that help you save more, spend smarter, and reach your goals faster.
+               </p>
+               <Link
+                 to="/login?tab=signup"
+                 className="inline-flex items-center gap-2 bg-white text-[#1E1B4B] font-semibold px-6 py-3 rounded-full hover:bg-[#C4B5FD] transition-all text-sm"
+               >
+                 Get started free <ArrowRight size={16} />
+               </Link>
+             </div>
+           </div>
+           {/* Budgets screenshot */}
+           <div className="mt-10 rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+             <img src={budgetsScreenshot} alt="Sonfi Budgets page showing spending breakdown and monthly analysis" className="w-full h-auto" loading="lazy" />
+           </div>
+         </div>
+       </Section>
 
       {/* ── FEATURES — Only 3 core features ── */}
       <div id="features" className="py-16 sm:py-24">
