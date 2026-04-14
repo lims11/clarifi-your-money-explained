@@ -4,6 +4,7 @@ import LandingNav from '@/components/landing/LandingNav';
 import { LaptopMockup, PhoneMockup } from '@/components/landing/DeviceMockups';
 import { DashboardWebMockup, DashboardMobileMockup } from '@/components/landing/DashboardMockup';
 import { ChatMockup, PulseMockup, CreditScoreMockup } from '@/components/landing/FeatureMockups';
+import { BudgetsWebMockup, AccountsWebMockup, ScheduledWebMockup, PulseWebMockup } from '@/components/landing/WebMockups';
 import { useScrollReveal } from '@/components/landing/useScrollReveal';
 
 function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
