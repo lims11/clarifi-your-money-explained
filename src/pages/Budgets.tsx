@@ -8,6 +8,20 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 
+function DataSourceBadge({ source }: { source: 'statement' | 'manual' | 'mixed' }) {
+  const config = {
+    statement: { label: 'From statement', icon: '📄', cls: 'bg-teal/10 text-teal border-teal/20' },
+    manual: { label: 'Manual entries', icon: '✏️', cls: 'bg-amber/10 text-amber border-amber/20' },
+    mixed: { label: 'Statement + manual', icon: '🔀', cls: 'bg-primary/10 text-primary border-primary/20' },
+  };
+  const c = config[source];
+  return (
+    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded border ${c.cls}`}>
+      {c.icon} {c.label}
+    </span>
+  );
+}
+
 const CATEGORIES = ['Food & Drink', 'Transport', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Travel', 'Personal', 'Education'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const PIE_COLORS = [
@@ -263,14 +277,17 @@ export default function BudgetsPage() {
               <div key={b.id} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0 text-sm">
                 <span className="flex items-center gap-2">
                   <span className="text-base">{categoryIcons[b.category] || '📊'}</span>
-                  <span className="truncate max-w-[120px]">{b.category}</span>
+                  <span className="truncate max-w-[100px]">{b.category}</span>
                 </span>
-                <div className="flex gap-6">
-                  <span className="w-16 text-right text-muted-foreground">{formatCurrency(Number(b.amount))}</span>
-                  <span className="w-16 text-right">{formatCurrency(b.spent)}</span>
-                  <span className={`w-14 text-right font-medium ${diff >= 0 ? 'text-teal' : 'text-coral'}`}>
-                    {diff >= 0 ? '' : '-'}{formatCurrency(Math.abs(diff))}
-                  </span>
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-4">
+                    <button className="w-16 text-right text-muted-foreground hover:text-primary group" title="Edit planned">{formatCurrency(Number(b.amount))} <Pencil size={8} className="inline opacity-0 group-hover:opacity-100" /></button>
+                    <button className="w-16 text-right hover:text-primary group" title="Edit actual">{formatCurrency(b.spent)} <Pencil size={8} className="inline opacity-0 group-hover:opacity-100" /></button>
+                    <span className={`w-14 text-right font-medium ${diff >= 0 ? 'text-teal' : 'text-coral'}`}>
+                      {diff >= 0 ? '' : '-'}{formatCurrency(Math.abs(diff))}
+                    </span>
+                  </div>
+                  <span className={`w-3 text-center ${diff >= 0 ? 'text-teal' : 'text-coral'}`}>{diff >= 0 ? '🟢' : '🔴'}</span>
                 </div>
               </div>
             );
@@ -374,6 +391,13 @@ export default function BudgetsPage() {
                     <p className="text-xs text-primary">{b.pct < 50 ? "You're on track — keep it up!" : b.pct < 80 ? `${formatCurrency(b.remaining)} left for the rest of the month.` : b.pct >= 100 ? `Over budget by ${formatCurrency(Math.abs(b.remaining))}` : `⚠ Tracking to overspend by ${formatCurrency(projected - Number(b.amount))}`}</p>
                   </>
                 )}
+                {/* Data source footer */}
+                <div className="flex items-center justify-between pt-2 mt-2 border-t border-dashed">
+                  <DataSourceBadge source={b.spent > 0 ? 'mixed' : 'manual'} />
+                  <button className="text-[11px] text-primary hover:underline" onClick={() => toast.info('Edit spending data coming soon')}>
+                    Edit spending data
+                  </button>
+                </div>
               </div>
             );
           })}

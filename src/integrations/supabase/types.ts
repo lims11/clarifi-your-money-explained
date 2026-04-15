@@ -59,6 +59,50 @@ export type Database = {
         }
         Relationships: []
       }
+      budget_overrides: {
+        Row: {
+          budget_id: string
+          created_at: string | null
+          id: string
+          original_amount: number | null
+          overridden_amount: number | null
+          override_date: string | null
+          override_type: string | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          budget_id: string
+          created_at?: string | null
+          id?: string
+          original_amount?: number | null
+          overridden_amount?: number | null
+          override_date?: string | null
+          override_type?: string | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          budget_id?: string
+          created_at?: string | null
+          id?: string
+          original_amount?: number | null
+          overridden_amount?: number | null
+          override_date?: string | null
+          override_type?: string | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_overrides_budget_id_fkey"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "budgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budgets: {
         Row: {
           amount: number
@@ -151,6 +195,57 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      goal_contributions: {
+        Row: {
+          amount: number
+          contribution_date: string | null
+          created_at: string | null
+          goal_id: string
+          id: string
+          is_recurring: boolean | null
+          note: string | null
+          source_account_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          contribution_date?: string | null
+          created_at?: string | null
+          goal_id: string
+          id?: string
+          is_recurring?: boolean | null
+          note?: string | null
+          source_account_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          contribution_date?: string | null
+          created_at?: string | null
+          goal_id?: string
+          id?: string
+          is_recurring?: boolean | null
+          note?: string | null
+          source_account_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_contributions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_contributions_source_account_id_fkey"
+            columns: ["source_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       goals: {
         Row: {
@@ -305,6 +400,72 @@ export type Database = {
         }
         Relationships: []
       }
+      reminder_preferences: {
+        Row: {
+          channels: Json | null
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          frequency: string
+          id: string
+          is_active: boolean | null
+          last_sent_at: string | null
+          payday_date: number | null
+          user_id: string
+        }
+        Insert: {
+          channels?: Json | null
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          frequency: string
+          id?: string
+          is_active?: boolean | null
+          last_sent_at?: string | null
+          payday_date?: number | null
+          user_id: string
+        }
+        Update: {
+          channels?: Json | null
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          last_sent_at?: string | null
+          payday_date?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_exports: {
+        Row: {
+          created_at: string | null
+          id: string
+          period_end: string | null
+          period_start: string | null
+          report_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          report_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          report_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scheduled_transactions: {
         Row: {
           account_id: string
@@ -351,6 +512,147 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "scheduled_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      statement_uploads: {
+        Row: {
+          account_id: string
+          bank_id: string
+          created_at: string | null
+          error_message: string | null
+          file_format: string
+          filename: string
+          id: string
+          period_end: string | null
+          period_start: string | null
+          status: string | null
+          transactions_found: number | null
+          transactions_imported: number | null
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          bank_id: string
+          created_at?: string | null
+          error_message?: string | null
+          file_format: string
+          filename: string
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: string | null
+          transactions_found?: number | null
+          transactions_imported?: number | null
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          bank_id?: string
+          created_at?: string | null
+          error_message?: string | null
+          file_format?: string
+          filename?: string
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: string | null
+          transactions_found?: number | null
+          transactions_imported?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "statement_uploads_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_surveys: {
+        Row: {
+          created_at: string | null
+          id: string
+          subscription_id: string
+          survey_date: string | null
+          usage_level: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          subscription_id: string
+          survey_date?: string | null
+          usage_level: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          subscription_id?: string
+          survey_date?: string | null
+          usage_level?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_surveys_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          account_id: string | null
+          amount: number
+          billing_day: number | null
+          billing_frequency: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_survey_date: string | null
+          service_name: string
+          usage_status: string | null
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          billing_day?: number | null
+          billing_frequency?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_survey_date?: string | null
+          service_name: string
+          usage_status?: string | null
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          billing_day?: number | null
+          billing_frequency?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_survey_date?: string | null
+          service_name?: string
+          usage_status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_account_id_fkey"
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "accounts"
