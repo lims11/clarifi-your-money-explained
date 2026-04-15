@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { DemoProvider } from "@/hooks/useDemoMode";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { DataModeProvider } from "@/context/DataModeContext";
 import { AppLayout } from "@/components/AppLayout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -39,6 +40,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <DataModeProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -95,6 +97,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </DataModeProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

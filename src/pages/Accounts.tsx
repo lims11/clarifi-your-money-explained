@@ -8,6 +8,7 @@ import { useDemoMode } from '@/hooks/useDemoMode';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { ResponsiveContainer, LineChart, Line } from 'recharts';
+import { AddAccountModal } from '@/components/accounts/AddAccountModal';
 
 const institutionLogos: Record<string, { bg: string; letter: string; dark?: boolean }> = {
   'Barclays': { bg: '#00AEEF', letter: 'B' },
@@ -254,35 +255,15 @@ export default function AccountsPage() {
         </div>
       )}
 
-      {/* Add account modal */}
+      {/* Add account modal — new 3-step flow */}
       {showAddAccount && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddAccount(false)}>
-          <div className="bg-card rounded-2xl border p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-medium mb-4">Add account</h3>
-            <div className="space-y-3">
-              <input placeholder="Account name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background" />
-              <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))} className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background">
-                {accountTypes.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
-              </select>
-              <input placeholder="Institution (e.g. Barclays)" value={form.institution} onChange={e => setForm(f => ({ ...f, institution: e.target.value }))} className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background" />
-              <input placeholder="Opening balance" type="number" step="0.01" value={form.balance} onChange={e => setForm(f => ({ ...f, balance: e.target.value }))} className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background" />
-              <div className="flex gap-2">
-                {colours.map(c => (
-                  <button key={c} onClick={() => setForm(f => ({ ...f, colour: c }))} className={`w-8 h-8 rounded-full border-2 ${form.colour === c ? 'border-foreground' : 'border-transparent'}`} style={{ backgroundColor: c }} />
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => setShowAddAccount(false)} className="flex-1">Cancel</Button>
-                <Button className="flex-1" disabled={!form.name} onClick={async () => {
-                  if (demo) { toast.success('Account added (demo)'); setShowAddAccount(false); return; }
-                  await addAccount.mutateAsync({ name: form.name, type: form.type, institution: form.institution, balance: parseFloat(form.balance) || 0, colour: form.colour });
-                  toast.success('Account added'); setShowAddAccount(false);
-                  setForm({ name: '', type: 'current', institution: '', balance: '', colour: '#7F77DD' });
-                }}>Add account</Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AddAccountModal
+          onClose={() => setShowAddAccount(false)}
+          onSave={async (data) => {
+            if (demo) return;
+            await addAccount.mutateAsync(data);
+          }}
+        />
       )}
 
       {/* Edit account modal */}
