@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Search, Download, Plus, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Download, FileText, Plus, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDate, categoryIcons, categoryColours } from '@/lib/finance';
-import { useTransactions, useAccounts, useAddTransaction } from '@/hooks/useFinanceData';
+import { useTransactions, useAccounts, useAddTransaction, useGoals, usePulseAlerts } from '@/hooks/useFinanceData';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const dateFilters = ['This month', 'Last month', 'Last 3 months', 'All'];
 const typeFilters = ['All', 'Income', 'Expense', 'Transfer'];
