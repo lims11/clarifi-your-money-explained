@@ -1,11 +1,10 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type DataMode = 'manual' | 'upload' | 'sync';
+type DataMode = 'upload' | 'sync';
 
 interface DataModeContextType {
   mode: DataMode;
   setMode: (mode: DataMode) => void;
-  isManual: boolean;
   isUpload: boolean;
 }
 
@@ -13,7 +12,8 @@ const DataModeContext = createContext<DataModeContextType | null>(null);
 
 export function DataModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<DataMode>(() => {
-    return (localStorage.getItem('sonfi_data_mode') as DataMode) || 'upload';
+    const stored = localStorage.getItem('sonfi_data_mode') as DataMode;
+    return stored === 'sync' ? 'sync' : 'upload';
   });
 
   useEffect(() => {
@@ -24,7 +24,6 @@ export function DataModeProvider({ children }: { children: ReactNode }) {
     <DataModeContext.Provider value={{
       mode,
       setMode,
-      isManual: mode === 'manual',
       isUpload: mode === 'upload',
     }}>
       {children}
