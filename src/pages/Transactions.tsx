@@ -67,6 +67,87 @@ export default function TransactionsPage() {
     toast.success('Exported transactions');
   };
 
+  const { data: goals } = useGoals();
+  const { data: pulseAlerts } = usePulseAlerts();
+  const [exportingPdf, setExportingPdf] = useState(false);
+
+  const exportPDF = async () => {
+    setExportingPdf(true);
+    try {
+      const totalIncome = filtered.filter(t => Number(t.amount) > 0).reduce((s, t) => s + Number(t.amount), 0);
+      const totalExpenses = Math.abs(filtered.filter(t => Number(t.amount) < 0).reduce((s, t) => s + Number(t.amount), 0));
+      const netWorth = (accounts || []).reduce((s, a) => s + Number(a.balance || 0), 0);
+
+      // Build category breakdown
+      const catMap: Record<string, number> = {};
+      filtered.filter(t => Number(t.amount) < 0).forEach(t => {
+        catMap[t.category] = (catMap[t.category] || 0) + Math.abs(Number(t.amount));
+      });
+      const maxCat = Math.max(...Object.values(catMap), 1);
+      const categories = Object.entries(catMap)
+        .sort((a, b) => b[1] - a[1])
+        .map(([name, amount]) => ({
+          name,
+          amount,
+          pct: Math.round((amount / maxCat) * 100),
+          colour: categoryColours[name] || '#7F77DD',
+        }));
+
+      const accountMap = (accounts || []).reduce((m, a) => { m[a.id] = a.name; return m; }, {} as Record<string, string>);
+
+      const reportData = {
+        netWorth,
+        totalIncome,
+        totalExpenses,
+        netSaved: totalIncome - totalExpenses,
+        categories,
+        transactions: filtered.slice(0, 200).map(t => ({
+          date: t.date,
+          payee: t.payee || t.description || t.category,
+          category: t.category,
+          accountName: accountMap[t.account_id] || '-',
+          amount: Number(t.amount),
+        })),
+        goals: (goals || []).map(g => ({
+          name: g.name,
+          icon: g.icon || '🎯',
+          current: Number(g.current_amount || 0),
+          target: Number(g.target_amount),
+          targetDate: g.target_date,
+        })),
+        pulseAlerts: (pulseAlerts || []).slice(0, 5).map(a => ({
+          title: a.title,
+          body: a.body,
+          type: a.type,
+        })),
+      };
+
+      const { data: result, error } = await supabase.functions.invoke('generate-report', {
+        body: {
+          data: reportData,
+          reportType: 'monthly',
+          periodStart: startDate || filtered[filtered.length - 1]?.date,
+          periodEnd: filtered[0]?.date,
+        },
+      });
+
+      if (error) throw error;
+
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(result.html);
+        win.document.close();
+        win.onload = () => win.print();
+      }
+      toast.success('PDF report generated');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate report');
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   if (isLoading) {
     return <div className="p-5 lg:p-8 max-w-4xl mx-auto space-y-4"><Skeleton className="h-8 w-32" /><Skeleton className="h-16 rounded-2xl" /><Skeleton className="h-64 rounded-2xl" /></div>;
   }
