@@ -108,7 +108,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     let mounted = true;
 
     const loadPreference = async () => {
-      if (!user || demo) {
+      if (!user || demo || isSampleAccount) {
         setLoadingPreference(false);
         return;
       }
@@ -135,10 +135,10 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     return () => {
       mounted = false;
     };
-  }, [account.id, demo, user]);
+  }, [account.id, demo, isSampleAccount, user]);
 
   const saveReminderPreference = async () => {
-    if (!user || demo) return;
+    if (!user || demo || isSampleAccount) return;
 
     const payload = {
       user_id: user.id,
@@ -397,13 +397,13 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
               <Button className="flex-1" onClick={handleParseFile} disabled={!file || parsing || loadingPreference}>
                 {parsing ? <><Loader2 size={14} className="animate-spin" /> Analysing...</> : 'Upload & analyse'}
               </Button>
-
-              {isSampleAccount && (
-                <p className="text-[11px] text-amber-500 text-center">
-                  ⚠ This is a sample account. Add a real account to import statements.
-                </p>
-              )}
             </div>
+
+            {isSampleAccount && (
+              <div className="rounded-lg border bg-muted/40 p-3 text-[11px] text-muted-foreground">
+                You can analyse statements on this sample account, but saving the import requires a real account.
+              </div>
+            )}
 
             <div className="rounded-xl border p-3 opacity-60">
               <div className="flex items-center gap-2">
@@ -475,10 +475,16 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
                 <button onClick={() => toggleAll(true)} className="text-xs text-primary hover:underline">Select all</button>
                 <button onClick={() => toggleAll(false)} className="text-xs text-muted-foreground hover:underline">Deselect all</button>
               </div>
-              <Button onClick={handleImport} disabled={importing || selectedCount === 0}>
+              <Button onClick={handleImport} disabled={importing || selectedCount === 0 || isSampleAccount}>
                 {importing ? <><Loader2 size={14} className="animate-spin" /> Importing...</> : <><CheckCircle2 size={14} /> Import {selectedCount}</>}
               </Button>
             </div>
+
+            {isSampleAccount && (
+              <p className="text-center text-[11px] text-muted-foreground">
+                Import is disabled for sample accounts. Create a real account to save these transactions.
+              </p>
+            )}
           </div>
         )}
 

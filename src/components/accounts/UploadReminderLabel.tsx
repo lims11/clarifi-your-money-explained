@@ -39,6 +39,7 @@ function formatShortDate(date: Date) {
 export function UploadReminderLabel({ accountId, onManage }: UploadReminderLabelProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
+  const isSampleAccount = !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(accountId);
   const [reminder, setReminder] = useState<{ frequency: string; payday_date: number | null } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +47,7 @@ export function UploadReminderLabel({ accountId, onManage }: UploadReminderLabel
     let mounted = true;
 
     const load = async () => {
-      if (!user || demo) {
+      if (!user || demo || isSampleAccount) {
         setLoading(false);
         return;
       }
@@ -68,7 +69,7 @@ export function UploadReminderLabel({ accountId, onManage }: UploadReminderLabel
 
     void load();
     return () => { mounted = false; };
-  }, [accountId, user, demo]);
+  }, [accountId, demo, isSampleAccount, user]);
 
   if (loading || !reminder) return null;
 
