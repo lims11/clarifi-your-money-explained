@@ -39,7 +39,6 @@ function formatShortDate(date: Date) {
 export function UploadReminderLabel({ accountId, onManage }: UploadReminderLabelProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
-  const isSampleAccount = !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(accountId);
   const [reminder, setReminder] = useState<{ frequency: string; payday_date: number | null } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -47,12 +46,12 @@ export function UploadReminderLabel({ accountId, onManage }: UploadReminderLabel
     let mounted = true;
 
     const load = async () => {
-      if (!user || demo || isSampleAccount) {
+      if (!user || demo) {
         setLoading(false);
         return;
       }
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('reminder_preferences')
         .select('frequency, payday_date')
         .eq('user_id', user.id)
@@ -63,13 +62,13 @@ export function UploadReminderLabel({ accountId, onManage }: UploadReminderLabel
         .limit(1);
 
       if (!mounted) return;
-      if (data?.[0]) setReminder(data[0]);
+      if (!error && data?.[0]) setReminder(data[0]);
       setLoading(false);
     };
 
     void load();
     return () => { mounted = false; };
-  }, [accountId, demo, isSampleAccount, user]);
+  }, [accountId, demo, user]);
 
   if (loading || !reminder) return null;
 

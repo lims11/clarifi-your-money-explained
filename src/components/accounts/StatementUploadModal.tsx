@@ -85,7 +85,6 @@ async function extractPdfText(file: File) {
 export function StatementUploadModal({ account, onClose }: StatementUploadModalProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
-  const isSampleAccount = !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(account.id);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bankId = useMemo(() => findBankId(account.institution), [account.institution]);
   const selectedBank = UK_BANKS.find((bank) => bank.id === bankId);
@@ -108,7 +107,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     let mounted = true;
 
     const loadPreference = async () => {
-      if (!user || demo || isSampleAccount) {
+      if (!user || demo) {
         setLoadingPreference(false);
         return;
       }
@@ -135,10 +134,10 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     return () => {
       mounted = false;
     };
-  }, [account.id, demo, isSampleAccount, user]);
+  }, [account.id, demo, user]);
 
   const saveReminderPreference = async () => {
-    if (!user || demo || isSampleAccount) return;
+    if (!user || demo) return;
 
     const payload = {
       user_id: user.id,
@@ -173,7 +172,8 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     setParseError('');
 
     try {
-      await saveReminderPreference();
+      // Save reminder preference (non-blocking — don't let it crash the parse)
+      try { await saveReminderPreference(); } catch (e) { console.warn('Reminder save skipped:', e); }
 
       const extension = file.name.split('.').pop()?.toLowerCase();
       const body = extension === 'pdf'
@@ -252,8 +252,8 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
 
   const handleImport = async () => {
     const selectedTransactions = parsedTransactions.filter((transaction) => transaction.selected);
-    if (!user || isSampleAccount) {
-      toast.error('Please create a real account first — sample accounts cannot store data.');
+    if (!user) {
+      toast.error('Please sign in to import transactions.');
       return;
     }
     if (selectedTransactions.length === 0) {
@@ -263,7 +263,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
 
     setImporting(true);
     try {
-      await saveReminderPreference();
+      try { await saveReminderPreference(); } catch (e) { console.warn('Reminder save skipped:', e); }
 
       const rows = selectedTransactions.map((transaction) => ({
         user_id: user.id,
@@ -399,12 +399,6 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
               </Button>
             </div>
 
-            {isSampleAccount && (
-              <div className="rounded-lg border bg-muted/40 p-3 text-[11px] text-muted-foreground">
-                You can analyse statements on this sample account, but saving the import requires a real account.
-              </div>
-            )}
-
             <div className="rounded-xl border p-3 opacity-60">
               <div className="flex items-center gap-2">
                 <Wifi size={14} className="text-muted-foreground" />
@@ -475,16 +469,10 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
                 <button onClick={() => toggleAll(true)} className="text-xs text-primary hover:underline">Select all</button>
                 <button onClick={() => toggleAll(false)} className="text-xs text-muted-foreground hover:underline">Deselect all</button>
               </div>
-              <Button onClick={handleImport} disabled={importing || selectedCount === 0 || isSampleAccount}>
+              <Button onClick={handleImport} disabled={importing || selectedCount === 0}>
                 {importing ? <><Loader2 size={14} className="animate-spin" /> Importing...</> : <><CheckCircle2 size={14} /> Import {selectedCount}</>}
               </Button>
             </div>
-
-            {isSampleAccount && (
-              <p className="text-center text-[11px] text-muted-foreground">
-                Import is disabled for sample accounts. Create a real account to save these transactions.
-              </p>
-            )}
           </div>
         )}
 
