@@ -157,7 +157,10 @@ export default function TransactionsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-medium">Transactions</h1>
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={exportCSV}><Download size={16} /> Export</Button>
+          <Button variant="ghost" size="sm" onClick={exportCSV}><Download size={16} /> CSV</Button>
+          <Button variant="ghost" size="sm" onClick={exportPDF} disabled={exportingPdf}>
+            <FileText size={16} /> {exportingPdf ? 'Generating...' : 'PDF'}
+          </Button>
           <Button size="sm" onClick={() => setShowAdd(true)}><Plus size={16} /> Add</Button>
         </div>
       </div>
