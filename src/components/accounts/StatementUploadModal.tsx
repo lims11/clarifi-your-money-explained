@@ -85,6 +85,7 @@ async function extractPdfText(file: File) {
 export function StatementUploadModal({ account, onClose }: StatementUploadModalProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
+  const isSampleAccount = !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(account.id);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bankId = useMemo(() => findBankId(account.institution), [account.institution]);
   const selectedBank = UK_BANKS.find((bank) => bank.id === bankId);
@@ -251,7 +252,10 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
 
   const handleImport = async () => {
     const selectedTransactions = parsedTransactions.filter((transaction) => transaction.selected);
-    if (!user) return;
+    if (!user || isSampleAccount) {
+      toast.error('Please create a real account first — sample accounts cannot store data.');
+      return;
+    }
     if (selectedTransactions.length === 0) {
       toast.error('No transactions selected');
       return;
@@ -393,6 +397,12 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
               <Button className="flex-1" onClick={handleParseFile} disabled={!file || parsing || loadingPreference}>
                 {parsing ? <><Loader2 size={14} className="animate-spin" /> Analysing...</> : 'Upload & analyse'}
               </Button>
+
+              {isSampleAccount && (
+                <p className="text-[11px] text-amber-500 text-center">
+                  ⚠ This is a sample account. Add a real account to import statements.
+                </p>
+              )}
             </div>
 
             <div className="rounded-xl border p-3 opacity-60">
