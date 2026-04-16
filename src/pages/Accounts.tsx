@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Plus, ArrowUpRight, ArrowDownRight, MoreHorizontal, Pencil, Trash2, Archive } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownRight, MoreHorizontal, Pencil, Trash2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDate } from '@/lib/finance';
 import { useAccounts, useTransactions, useAddAccount, useAddTransaction, useUpdateAccount, useDeleteAccount } from '@/hooks/useFinanceData';
@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { ResponsiveContainer, LineChart, Line } from 'recharts';
 import { AddAccountModal } from '@/components/accounts/AddAccountModal';
+import { StatementUploadModal } from '@/components/accounts/StatementUploadModal';
 
 const institutionLogos: Record<string, { bg: string; letter: string; dark?: boolean }> = {
   'Barclays': { bg: '#00AEEF', letter: 'B' },
@@ -55,6 +56,7 @@ export default function AccountsPage() {
   const [editForm, setEditForm] = useState<any>({});
   const [deletingAccount, setDeletingAccount] = useState<any>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
+  const [uploadingAccount, setUploadingAccount] = useState<{ id: string; name: string; institution?: string | null } | null>(null);
 
   useEffect(() => {
     const handleClick = () => setMenuOpen(null);
@@ -88,7 +90,16 @@ export default function AccountsPage() {
 
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-medium">Transactions</h2>
-          <Button size="sm" onClick={() => setShowAddTxn(true)}><Plus size={14} /> Add</Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setUploadingAccount({ id: account.id, name: account.name, institution: account.institution })}
+            >
+              <Upload size={14} /> Upload statement
+            </Button>
+            <Button size="sm" onClick={() => setShowAddTxn(true)}><Plus size={14} /> Add</Button>
+          </div>
         </div>
         {accountTxns.length > 0 ? (
           <div className="sonfi-card divide-y">
@@ -146,6 +157,13 @@ export default function AccountsPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {uploadingAccount && (
+          <StatementUploadModal
+            account={uploadingAccount}
+            onClose={() => setUploadingAccount(null)}
+          />
         )}
       </div>
     );
@@ -240,10 +258,20 @@ export default function AccountsPage() {
                             )}
                           </div>
                         </div>
-                        <div className="flex gap-4 mt-3 pt-3 border-t text-xs">
+                        <div className="mt-3 flex flex-wrap items-center gap-3 border-t pt-3 text-xs">
                           <span className="flex items-center gap-1 amount-positive"><ArrowUpRight size={12} /> {formatCurrency(monthIncome)}</span>
                           <span className="flex items-center gap-1 amount-negative"><ArrowDownRight size={12} /> {formatCurrency(monthExpenses)}</span>
-                          <Link to={`/accounts/${a.id}`} className="ml-auto text-primary">View transactions →</Link>
+                          <div className="ml-auto flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-xs"
+                              onClick={() => setUploadingAccount({ id: a.id, name: a.name, institution: a.institution })}
+                            >
+                              <Upload size={12} /> Upload statement
+                            </Button>
+                            <Link to={`/accounts/${a.id}`} className="text-primary">View transactions →</Link>
+                          </div>
                         </div>
                       </div>
                     );
@@ -263,6 +291,13 @@ export default function AccountsPage() {
             if (demo) return;
             await addAccount.mutateAsync(data);
           }}
+        />
+      )}
+
+      {uploadingAccount && (
+        <StatementUploadModal
+          account={uploadingAccount}
+          onClose={() => setUploadingAccount(null)}
         />
       )}
 
