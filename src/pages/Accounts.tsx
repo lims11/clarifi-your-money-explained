@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Plus, ArrowUpRight, ArrowDownRight, MoreHorizontal, Pencil, Trash2, Upload } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownRight, MoreHorizontal, Pencil, Trash2, Upload, CalendarClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDate } from '@/lib/finance';
 import { useAccounts, useTransactions, useAddAccount, useAddTransaction, useUpdateAccount, useDeleteAccount } from '@/hooks/useFinanceData';
@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { ResponsiveContainer, LineChart, Line } from 'recharts';
 import { AddAccountModal } from '@/components/accounts/AddAccountModal';
 import { StatementUploadModal } from '@/components/accounts/StatementUploadModal';
+import { UploadReminderLabel } from '@/components/accounts/UploadReminderLabel';
 
 const institutionLogos: Record<string, { bg: string; letter: string; dark?: boolean }> = {
   'Barclays': { bg: '#00AEEF', letter: 'B' },
@@ -273,6 +274,10 @@ export default function AccountsPage() {
                             <Link to={`/accounts/${a.id}`} className="text-primary">View transactions →</Link>
                           </div>
                         </div>
+                        <UploadReminderLabel
+                          accountId={a.id}
+                          onManage={() => setUploadingAccount({ id: a.id, name: a.name, institution: a.institution })}
+                        />
                       </div>
                     );
                   })}
