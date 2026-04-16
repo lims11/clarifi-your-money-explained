@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Search, Download, Plus, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Download, FileText, Plus, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDate, categoryIcons, categoryColours } from '@/lib/finance';
-import { useTransactions, useAccounts, useAddTransaction } from '@/hooks/useFinanceData';
+import { useTransactions, useAccounts, useAddTransaction, useGoals, usePulseAlerts } from '@/hooks/useFinanceData';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const dateFilters = ['This month', 'Last month', 'Last 3 months', 'All'];
 const typeFilters = ['All', 'Income', 'Expense', 'Transfer'];
@@ -66,6 +67,87 @@ export default function TransactionsPage() {
     toast.success('Exported transactions');
   };
 
+  const { data: goals } = useGoals();
+  const { data: pulseAlerts } = usePulseAlerts();
+  const [exportingPdf, setExportingPdf] = useState(false);
+
+  const exportPDF = async () => {
+    setExportingPdf(true);
+    try {
+      const totalIncome = filtered.filter(t => Number(t.amount) > 0).reduce((s, t) => s + Number(t.amount), 0);
+      const totalExpenses = Math.abs(filtered.filter(t => Number(t.amount) < 0).reduce((s, t) => s + Number(t.amount), 0));
+      const netWorth = (accounts || []).reduce((s, a) => s + Number(a.balance || 0), 0);
+
+      // Build category breakdown
+      const catMap: Record<string, number> = {};
+      filtered.filter(t => Number(t.amount) < 0).forEach(t => {
+        catMap[t.category] = (catMap[t.category] || 0) + Math.abs(Number(t.amount));
+      });
+      const maxCat = Math.max(...Object.values(catMap), 1);
+      const categories = Object.entries(catMap)
+        .sort((a, b) => b[1] - a[1])
+        .map(([name, amount]) => ({
+          name,
+          amount,
+          pct: Math.round((amount / maxCat) * 100),
+          colour: categoryColours[name] || '#7F77DD',
+        }));
+
+      const accountMap = (accounts || []).reduce((m, a) => { m[a.id] = a.name; return m; }, {} as Record<string, string>);
+
+      const reportData = {
+        netWorth,
+        totalIncome,
+        totalExpenses,
+        netSaved: totalIncome - totalExpenses,
+        categories,
+        transactions: filtered.slice(0, 200).map(t => ({
+          date: t.date,
+          payee: t.payee || t.description || t.category,
+          category: t.category,
+          accountName: accountMap[t.account_id] || '-',
+          amount: Number(t.amount),
+        })),
+        goals: (goals || []).map(g => ({
+          name: g.name,
+          icon: g.icon || '🎯',
+          current: Number(g.current_amount || 0),
+          target: Number(g.target_amount),
+          targetDate: g.target_date,
+        })),
+        pulseAlerts: (pulseAlerts || []).slice(0, 5).map(a => ({
+          title: a.title,
+          body: a.body,
+          type: a.type,
+        })),
+      };
+
+      const { data: result, error } = await supabase.functions.invoke('generate-report', {
+        body: {
+          data: reportData,
+          reportType: 'monthly',
+          periodStart: startDate || filtered[filtered.length - 1]?.date,
+          periodEnd: filtered[0]?.date,
+        },
+      });
+
+      if (error) throw error;
+
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(result.html);
+        win.document.close();
+        win.onload = () => win.print();
+      }
+      toast.success('PDF report generated');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate report');
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   if (isLoading) {
     return <div className="p-5 lg:p-8 max-w-4xl mx-auto space-y-4"><Skeleton className="h-8 w-32" /><Skeleton className="h-16 rounded-2xl" /><Skeleton className="h-64 rounded-2xl" /></div>;
   }
@@ -75,7 +157,10 @@ export default function TransactionsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-medium">Transactions</h1>
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={exportCSV}><Download size={16} /> Export</Button>
+          <Button variant="ghost" size="sm" onClick={exportCSV}><Download size={16} /> CSV</Button>
+          <Button variant="ghost" size="sm" onClick={exportPDF} disabled={exportingPdf}>
+            <FileText size={16} /> {exportingPdf ? 'Generating...' : 'PDF'}
+          </Button>
           <Button size="sm" onClick={() => setShowAdd(true)}><Plus size={16} /> Add</Button>
         </div>
       </div>
