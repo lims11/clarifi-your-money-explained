@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { UK_BANKS, getBankById } from '@/data/ukBanks';
-import { useAccounts, useAddAccount } from '@/hooks/useFinanceData';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { UpcomingBadge } from '@/components/UpcomingBadge';
 import { toast } from 'sonner';
-import { ArrowLeft, Search, Upload, Edit3, Wifi, CreditCard, Landmark, PiggyBank, Home, TrendingUp, Bitcoin, Wallet, Briefcase } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { ArrowLeft, Search, Upload, Wifi, CreditCard, Landmark, PiggyBank, Home, TrendingUp, Bitcoin, Wallet, Briefcase, FileText, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 const ACCOUNT_TYPES = [
   { id: 'current', label: 'Current Account', icon: Landmark, desc: 'Everyday spending' },
@@ -18,14 +19,43 @@ const ACCOUNT_TYPES = [
   { id: 'business', label: 'Business Account', icon: Briefcase, desc: 'Business finances' },
 ];
 
+const UPLOAD_FREQUENCIES = [
+  { id: 'weekly', label: 'Weekly' },
+  { id: 'monthly', label: 'Monthly (recommended)' },
+  { id: 'quarterly', label: 'Quarterly' },
+  { id: 'adhoc', label: 'Ad hoc' },
+];
+
+interface ParsedTransaction {
+  date: string;
+  description: string;
+  amount: number;
+  type: 'income' | 'expense';
+  rawDescription: string;
+  suggestedCategory?: string;
+  suggestedSubcategory?: string;
+  confidence?: number;
+  selected: boolean;
+  editedCategory?: string;
+}
+
 interface AddAccountModalProps {
   onClose: () => void;
   onSave: (data: { name: string; type: string; institution: string; balance: number; colour: string }) => void;
 }
 
 export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
+  const { user } = useAuth();
+  const demo = useDemoMode();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Step navigation
   const [step, setStep] = useState(1);
+
+  // Step 1: Account type
   const [accountType, setAccountType] = useState('');
+
+  // Step 2: Bank + details
   const [bankId, setBankId] = useState('');
   const [customBankName, setCustomBankName] = useState('');
   const [bankSearch, setBankSearch] = useState('');
@@ -33,7 +63,19 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
   const [balance, setBalance] = useState('');
   const [creditLimit, setCreditLimit] = useState('');
   const [interestRate, setInterestRate] = useState('');
-  const demo = useDemoMode();
+
+  // Step 3: Upload
+  const [uploadFrequency, setUploadFrequency] = useState('monthly');
+  const [file, setFile] = useState<File | null>(null);
+  const [parsing, setParsing] = useState(false);
+  const [parseError, setParseError] = useState('');
+
+  // Step 4: Review parsed transactions
+  const [parsedTransactions, setParsedTransactions] = useState<ParsedTransaction[]>([]);
+  const [parseSummary, setParseSummary] = useState<{ total: number; income: number; expenses: number } | null>(null);
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'review' | 'income' | 'expense'>('all');
+  const [importing, setImporting] = useState(false);
+  const [savedAccountId, setSavedAccountId] = useState<string | null>(null);
 
   const selectedBank = getBankById(bankId);
   const bankName = bankId === 'other' ? customBankName : (selectedBank?.name || '');
@@ -56,22 +98,180 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
     }
   };
 
-  const handleSave = () => {
+  // Save account first, then proceed to upload
+  const handleSaveAndUpload = async () => {
+    if (demo) {
+      toast.success('Account added (demo)');
+      setStep(3);
+      return;
+    }
+    try {
+      const accountData = {
+        name: nickname || `${bankName} ${accountType}`,
+        type: accountType === 'business' ? 'current' : accountType,
+        institution: bankName,
+        balance: parseFloat(balance) || 0,
+        colour: selectedBank?.colour || '#7F77DD',
+      };
+      // Save the account
+      const { data, error } = await supabase.from('accounts').insert({
+        ...accountData,
+        user_id: user!.id,
+      }).select().single();
+      if (error) throw error;
+      setSavedAccountId(data.id);
+      toast.success('Account created');
+      setStep(3);
+    } catch (err) {
+      toast.error('Failed to create account');
+      console.error(err);
+    }
+  };
+
+  // Save account without upload (skip)
+  const handleSaveSkip = async () => {
     if (demo) {
       toast.success('Account added (demo)');
       onClose();
       return;
     }
-    onSave({
-      name: nickname || `${bankName} ${accountType}`,
-      type: accountType === 'business' ? 'current' : accountType,
-      institution: bankName,
-      balance: parseFloat(balance) || 0,
-      colour: selectedBank?.colour || '#7F77DD',
-    });
-    toast.success('Account added');
+    if (!savedAccountId) {
+      const accountData = {
+        name: nickname || `${bankName} ${accountType}`,
+        type: accountType === 'business' ? 'current' : accountType,
+        institution: bankName,
+        balance: parseFloat(balance) || 0,
+        colour: selectedBank?.colour || '#7F77DD',
+      };
+      onSave(accountData);
+    }
+    toast.success('Account added — you can upload statements later');
     onClose();
   };
+
+  const handleFileDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const dropped = e.dataTransfer.files[0];
+    if (dropped) setFile(dropped);
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) setFile(e.target.files[0]);
+  };
+
+  const handleParseFile = async () => {
+    if (!file) return;
+    setParsing(true);
+    setParseError('');
+
+    try {
+      const text = await file.text();
+
+      const { data: result, error } = await supabase.functions.invoke('parse-statement', {
+        body: { csvText: text, bankId },
+      });
+
+      if (error) throw error;
+      if (result.error) throw new Error(result.error);
+
+      const txns: ParsedTransaction[] = (result.transactions || []).map((t: any) => ({
+        ...t,
+        selected: true,
+        editedCategory: undefined,
+      }));
+
+      setParsedTransactions(txns);
+      setParseSummary(result.summary);
+      setStep(4);
+    } catch (err: any) {
+      console.error(err);
+      setParseError(err.message || 'Failed to parse statement');
+    } finally {
+      setParsing(false);
+    }
+  };
+
+  const toggleTransaction = (idx: number) => {
+    setParsedTransactions(prev => prev.map((t, i) => i === idx ? { ...t, selected: !t.selected } : t));
+  };
+
+  const toggleAll = (selected: boolean) => {
+    setParsedTransactions(prev => prev.map(t => ({ ...t, selected })));
+  };
+
+  const updateCategory = (idx: number, category: string) => {
+    setParsedTransactions(prev => prev.map((t, i) => i === idx ? { ...t, editedCategory: category } : t));
+  };
+
+  const filteredReview = parsedTransactions.filter(t => {
+    if (reviewFilter === 'review') return (t.confidence || 0) < 0.8;
+    if (reviewFilter === 'income') return t.type === 'income';
+    if (reviewFilter === 'expense') return t.type === 'expense';
+    return true;
+  });
+
+  const selectedCount = parsedTransactions.filter(t => t.selected).length;
+
+  const handleImport = async () => {
+    const toImport = parsedTransactions.filter(t => t.selected);
+    if (toImport.length === 0) { toast.error('No transactions selected'); return; }
+
+    setImporting(true);
+    try {
+      const accountId = savedAccountId;
+      if (!accountId || !user) throw new Error('No account ID');
+
+      const rows = toImport.map(t => ({
+        account_id: accountId,
+        user_id: user.id,
+        date: t.date,
+        payee: t.description,
+        description: t.rawDescription,
+        amount: t.amount,
+        type: t.type,
+        category: t.editedCategory || t.suggestedCategory || (t.type === 'income' ? 'Income' : 'Shopping'),
+        subcategory: t.suggestedSubcategory || null,
+        ai_category_confidence: t.confidence || null,
+        ai_category_reason: t.suggestedCategory ? `AI categorised from statement` : null,
+      }));
+
+      // Insert in batches of 50
+      for (let i = 0; i < rows.length; i += 50) {
+        const batch = rows.slice(i, i + 50);
+        const { error } = await supabase.from('transactions').insert(batch);
+        if (error) throw error;
+      }
+
+      // Update account balance based on transactions
+      const totalChange = toImport.reduce((s, t) => s + t.amount, 0);
+      const currentBal = parseFloat(balance) || 0;
+      await supabase.from('accounts').update({ balance: currentBal + totalChange }).eq('id', accountId);
+
+      // Record the upload
+      await supabase.from('statement_uploads').insert({
+        user_id: user.id,
+        account_id: accountId,
+        filename: file?.name || 'statement.csv',
+        bank_id: bankId,
+        file_format: file?.name.split('.').pop() || 'csv',
+        transactions_found: parsedTransactions.length,
+        transactions_imported: toImport.length,
+        status: 'complete',
+      });
+
+      toast.success(`Imported ${toImport.length} transactions!`);
+      onClose();
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to import: ' + (err.message || 'Unknown error'));
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const CATEGORIES = ['Food & Drink', 'Transport', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Travel', 'Education', 'Savings', 'Investment', 'Income', 'Personal'];
+
+  const fmt = (n: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(n);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
@@ -79,22 +279,28 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
           {step > 1 && (
-            <button onClick={() => setStep(step - 1)} className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80">
+            <button onClick={() => setStep(step === 4 ? 3 : step - 1)} className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80">
               <ArrowLeft size={16} />
             </button>
           )}
           <div>
-            <h3 className="text-lg font-semibold">Add account</h3>
-            <p className="text-xs text-muted-foreground">Step {step} of 3</p>
+            <h3 className="text-lg font-semibold">
+              {step === 4 ? 'Review transactions' : 'Add account'}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {step === 4 ? `${parsedTransactions.length} transactions found` : `Step ${step} of 3`}
+            </p>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div className="flex gap-1 mb-6">
-          {[1, 2, 3].map(s => (
-            <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? 'bg-primary' : 'bg-muted'}`} />
-          ))}
-        </div>
+        {step <= 3 && (
+          <div className="flex gap-1 mb-6">
+            {[1, 2, 3].map(s => (
+              <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? 'bg-primary' : 'bg-muted'}`} />
+            ))}
+          </div>
+        )}
 
         {/* STEP 1: Choose type */}
         {step === 1 && (
@@ -128,24 +334,13 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
                 <p className="text-sm font-medium mb-3">Choose your bank</p>
                 <div className="relative mb-3">
                   <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    placeholder="Search banks..."
-                    value={bankSearch}
-                    onChange={e => setBankSearch(e.target.value)}
-                    className="w-full border rounded-xl pl-9 pr-4 py-2.5 text-sm bg-background"
-                  />
+                  <input placeholder="Search banks..." value={bankSearch} onChange={e => setBankSearch(e.target.value)} className="w-full border rounded-xl pl-9 pr-4 py-2.5 text-sm bg-background" />
                 </div>
                 <div className="grid grid-cols-3 gap-2 max-h-[40vh] overflow-y-auto">
                   {filteredBanks.map(bank => (
-                    <button
-                      key={bank.id}
-                      onClick={() => handleSelectBank(bank.id)}
-                      className="flex flex-col items-center gap-2 p-3 rounded-xl border hover:border-primary/30 hover:bg-primary/5 transition-all"
-                    >
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                        style={{ backgroundColor: bank.colour }}
-                      >
+                    <button key={bank.id} onClick={() => handleSelectBank(bank.id)}
+                      className="flex flex-col items-center gap-2 p-3 rounded-xl border hover:border-primary/30 hover:bg-primary/5 transition-all">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: bank.colour }}>
                         {bank.letter}
                       </div>
                       <span className="text-[11px] font-medium text-center leading-tight">{bank.name}</span>
@@ -156,10 +351,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-muted/50">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                    style={{ backgroundColor: selectedBank?.colour || '#7F77DD' }}
-                  >
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: selectedBank?.colour || '#7F77DD' }}>
                     {selectedBank?.letter || '?'}
                   </div>
                   <div className="flex-1">
@@ -173,35 +365,16 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
                   {bankId === 'other' && (
                     <div>
                       <label className="text-xs font-medium text-muted-foreground block mb-1">Bank name</label>
-                      <input
-                        placeholder="Enter your bank name"
-                        value={customBankName}
-                        onChange={e => setCustomBankName(e.target.value)}
-                        className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background"
-                      />
+                      <input placeholder="Enter your bank name" value={customBankName} onChange={e => setCustomBankName(e.target.value)} className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background" />
                     </div>
                   )}
                   <div>
                     <label className="text-xs font-medium text-muted-foreground block mb-1">Account nickname</label>
-                    <input
-                      placeholder="e.g. Barclays Current"
-                      value={nickname}
-                      onChange={e => setNickname(e.target.value)}
-                      className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background"
-                    />
+                    <input placeholder="e.g. Barclays Current" value={nickname} onChange={e => setNickname(e.target.value)} className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background" />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground block mb-1">
-                      {accountType === 'credit_card' ? 'Current balance (£)' : 'Current balance (£)'}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      value={balance}
-                      onChange={e => setBalance(e.target.value)}
-                      className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background"
-                    />
+                    <label className="text-xs font-medium text-muted-foreground block mb-1">Current balance (£)</label>
+                    <input type="number" step="0.01" placeholder="0.00" value={balance} onChange={e => setBalance(e.target.value)} className="w-full border rounded-xl px-4 py-2.5 text-sm bg-background" />
                   </div>
                   {accountType === 'credit_card' && (
                     <div>
@@ -217,85 +390,175 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
                   )}
                 </div>
 
-                <Button className="w-full mt-4" onClick={() => setStep(3)} disabled={!nickname && bankId === 'other' && !customBankName}>
-                  Continue
+                <Button className="w-full mt-4" onClick={handleSaveAndUpload} disabled={!nickname && bankId === 'other' && !customBankName}>
+                  Continue to upload
                 </Button>
               </>
             )}
           </div>
         )}
 
-        {/* STEP 3: How to add data */}
+        {/* STEP 3: Upload statement */}
         {step === 3 && (
-          <div className="space-y-3">
-            <p className="text-sm font-medium mb-2">How would you like to add your data?</p>
+          <div className="space-y-4">
+            <p className="text-sm font-medium">Upload your {bankName} statement</p>
+            <p className="text-xs text-muted-foreground">Upload a CSV file from your bank. Sonfi will read and categorise your transactions automatically using AI.</p>
 
-            {/* Upload option */}
-            <button
-              onClick={handleSave}
-              className="w-full text-left p-4 rounded-xl border-2 border-primary/20 hover:border-primary bg-primary/5 transition-all"
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                  <Upload size={18} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold">Upload my bank statement</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Upload a PDF, CSV, or Excel file from your bank. Sonfi will read your transactions automatically.
-                  </p>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {(selectedBank?.statementFormats || ['pdf', 'csv']).map(fmt => (
-                      <span key={fmt} className="text-[10px] font-medium uppercase px-2 py-0.5 rounded bg-muted text-muted-foreground">{fmt}</span>
-                    ))}
-                  </div>
-                  {selectedBank?.pdfHint && (
-                    <p className="text-[11px] text-primary mt-2">💡 {selectedBank.pdfHint}</p>
-                  )}
-                </div>
+            {selectedBank?.pdfHint && (
+              <div className="rounded-lg bg-primary/5 border border-primary/20 p-3">
+                <p className="text-[11px] text-primary">💡 {selectedBank.pdfHint}</p>
               </div>
-            </button>
+            )}
 
-            {/* Manual option */}
-            <button
-              onClick={handleSave}
-              className="w-full text-left p-4 rounded-xl border-2 border-border hover:border-teal/30 transition-all"
+            {/* Supported formats */}
+            <div className="flex flex-wrap gap-1">
+              {['CSV'].map(f => (
+                <span key={f} className="text-[10px] font-medium uppercase px-2 py-0.5 rounded bg-muted text-muted-foreground">{f}</span>
+              ))}
+              <span className="text-[10px] text-muted-foreground ml-1">(PDF support coming soon)</span>
+            </div>
+
+            {/* File drop zone */}
+            <div
+              onDragOver={e => e.preventDefault()}
+              onDrop={handleFileDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                file ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30 hover:bg-muted/50'
+              }`}
             >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-teal/10 flex items-center justify-center text-teal">
-                  <Edit3 size={18} />
+              <input ref={fileInputRef} type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
+              {file ? (
+                <div className="space-y-2">
+                  <FileText size={24} className="mx-auto text-primary" />
+                  <p className="text-sm font-medium">{file.name}</p>
+                  <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</p>
+                  <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="text-xs text-primary hover:underline">Remove</button>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold">Enter transactions manually</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Type your transactions yourself. You're in full control of your data.
-                  </p>
-                  <p className="text-[11px] text-muted-foreground mt-1">
-                    You can always upload a statement later to bulk-import history.
-                  </p>
+              ) : (
+                <div className="space-y-2">
+                  <Upload size={24} className="mx-auto text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Drop your statement here or click to browse</p>
+                  <p className="text-[11px] text-muted-foreground">CSV files supported</p>
                 </div>
-              </div>
-            </button>
+              )}
+            </div>
 
-            {/* Bank sync - UPCOMING */}
-            <div className="w-full text-left p-4 rounded-xl border-2 border-border opacity-50 cursor-not-allowed">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
-                  <Wifi size={18} />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold">Connect directly to {bankName || 'your bank'}</p>
-                    <UpcomingBadge />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Automatic real-time transaction sync. Coming soon.
-                  </p>
-                  <button className="text-xs text-primary font-medium mt-2 hover:underline" onClick={e => { e.stopPropagation(); toast.success('You\'re on the waitlist!'); }}>
-                    Join waitlist →
+            {parseError && (
+              <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 rounded-lg p-3">
+                <AlertCircle size={14} />
+                {parseError}
+              </div>
+            )}
+
+            {/* Upload frequency */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-2">How often will you upload statements?</label>
+              <div className="flex flex-wrap gap-2">
+                {UPLOAD_FREQUENCIES.map(f => (
+                  <button key={f.id} onClick={() => setUploadFrequency(f.id)}
+                    className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${uploadFrequency === f.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+                    {f.label}
                   </button>
-                </div>
+                ))}
               </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button variant="ghost" onClick={handleSaveSkip} className="flex-1">
+                Skip — add later
+              </Button>
+              <Button className="flex-1" onClick={handleParseFile} disabled={!file || parsing}>
+                {parsing ? <><Loader2 size={14} className="animate-spin" /> Analysing...</> : 'Upload & Analyse'}
+              </Button>
+            </div>
+
+            {/* Bank sync upcoming */}
+            <div className="w-full p-3 rounded-xl border opacity-50 mt-2">
+              <div className="flex items-center gap-2">
+                <Wifi size={14} className="text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Or connect directly to {bankName || 'your bank'}</span>
+                <UpcomingBadge />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 4: Review parsed transactions */}
+        {step === 4 && (
+          <div className="space-y-4">
+            {/* Summary bar */}
+            {parseSummary && (
+              <div className="flex flex-wrap gap-4 text-xs p-3 rounded-xl bg-muted/50">
+                <span>{parseSummary.total} transactions</span>
+                <span className="amount-positive">In: {fmt(parseSummary.income)}</span>
+                <span className="amount-negative">Out: {fmt(parseSummary.expenses)}</span>
+                <span className="font-medium">Net: {fmt(parseSummary.income - parseSummary.expenses)}</span>
+              </div>
+            )}
+
+            {/* Filter tabs */}
+            <div className="flex gap-2">
+              {([['all', 'All'], ['review', 'Review needed'], ['income', 'Income'], ['expense', 'Expenses']] as const).map(([key, label]) => (
+                <button key={key} onClick={() => setReviewFilter(key)}
+                  className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${reviewFilter === key ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                  {label}
+                  {key === 'review' && ` (${parsedTransactions.filter(t => (t.confidence || 0) < 0.8).length})`}
+                </button>
+              ))}
+            </div>
+
+            {/* Transaction list */}
+            <div className="max-h-[40vh] overflow-y-auto space-y-1">
+              {filteredReview.map((t, idx) => {
+                const realIdx = parsedTransactions.indexOf(t);
+                const conf = t.confidence || 0;
+                const confColor = conf >= 0.9 ? 'border-green-400' : conf >= 0.7 ? 'border-amber-400' : 'border-red-400';
+                return (
+                  <div key={idx} className={`flex items-center gap-2 p-2 rounded-lg border ${t.selected ? 'bg-background' : 'bg-muted/30 opacity-60'}`}>
+                    <input type="checkbox" checked={t.selected} onChange={() => toggleTransaction(realIdx)} className="rounded" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-medium truncate">{t.description || 'Unknown'}</p>
+                        <span className="text-[10px] text-muted-foreground flex-shrink-0">{t.date}</span>
+                      </div>
+                      {t.rawDescription !== t.description && (
+                        <p className="text-[10px] text-muted-foreground truncate">raw: {t.rawDescription}</p>
+                      )}
+                    </div>
+                    <select
+                      value={t.editedCategory || t.suggestedCategory || 'Shopping'}
+                      onChange={e => updateCategory(realIdx, e.target.value)}
+                      className={`text-[11px] border-2 rounded-lg px-2 py-1 bg-background ${confColor} min-w-[90px]`}
+                    >
+                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <span className={`text-xs font-medium min-w-[70px] text-right ${t.amount > 0 ? 'amount-positive' : 'amount-negative'}`}>
+                      {fmt(t.amount)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Confidence legend */}
+            <div className="flex items-center gap-4 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 border-2 border-green-400 rounded" /> High confidence</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 border-2 border-amber-400 rounded" /> Medium</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 border-2 border-red-400 rounded" /> Needs review</span>
+            </div>
+
+            {/* Bottom bar */}
+            <div className="flex items-center justify-between pt-2 border-t">
+              <div className="flex gap-2">
+                <button onClick={() => toggleAll(true)} className="text-xs text-primary hover:underline">Select all</button>
+                <button onClick={() => toggleAll(false)} className="text-xs text-muted-foreground hover:underline">Deselect all</button>
+              </div>
+              <Button onClick={handleImport} disabled={importing || selectedCount === 0}>
+                {importing ? <><Loader2 size={14} className="animate-spin" /> Importing...</> : (
+                  <><CheckCircle2 size={14} /> Import {selectedCount} transactions</>
+                )}
+              </Button>
             </div>
           </div>
         )}

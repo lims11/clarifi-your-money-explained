@@ -32,30 +32,7 @@ export function DataModeSwitcher({ onClose }: { onClose: () => void }) {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Upload PDF, CSV, or Excel files from your bank. Sonfi analyses them automatically. Recommended for most users.
-                </p>
-              </div>
-            </div>
-          </button>
-
-          {/* Manual mode */}
-          <button
-            onClick={() => { setMode('manual'); onClose(); }}
-            className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-              mode === 'manual' ? 'border-teal bg-teal/5' : 'border-border hover:border-teal/30'
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">✏️</span>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">Enter everything manually</span>
-                  {mode === 'manual' && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-teal/10 text-teal">Current mode</span>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  You enter your own transactions, balances, and goals. Full control — great if you prefer a spreadsheet-like approach.
+                  Upload PDF, CSV, or Excel files from your bank. Sonfi analyses and categorises them automatically. You can edit any transaction or budget inline.
                 </p>
               </div>
             </div>
