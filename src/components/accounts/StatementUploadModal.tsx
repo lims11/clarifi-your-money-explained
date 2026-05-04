@@ -132,23 +132,12 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
       // Save reminder preference (non-blocking — don't let it crash the parse)
       try { await saveReminderPreference(); } catch (e) { console.warn('Reminder save skipped:', e); }
 
-      const extension = file.name.split('.').pop()?.toLowerCase();
-      const body = extension === 'pdf'
-        ? { fileType: 'pdf', statementText: await extractPdfText(file), bankId, filename: file.name }
-        : { fileType: 'csv', csvText: await file.text(), bankId, filename: file.name };
-
-      const { data, error } = await supabase.functions.invoke('parse-statement', { body });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
-      setParsedTransactions((data.transactions || []).map((transaction: Omit<ParsedTransaction, 'selected'>) => ({
-        ...transaction,
-        selected: true,
-      })));
-      setParseSummary(data.summary || null);
+      const result = await uploadBankStatementFile(file, bankId);
+      setParsedTransactions(result.transactions);
+      setParseSummary(result.summary);
     } catch (error: any) {
-      console.error(error);
-      setParseError(error.message || 'Failed to parse statement');
+      console.error('Import upload error:', error);
+      setParseError(getStatementUploadError(error));
     } finally {
       setParsing(false);
     }
@@ -408,7 +397,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
                       onChange={(event) => setParsedTransactions((current) => current.map((row, rowIndex) => rowIndex === index ? { ...row, editedCategory: event.target.value } : row))}
                       className={`min-w-[108px] rounded-lg border-2 bg-background px-2 py-1 text-[11px] ${confidenceClass}`}
                     >
-                      {CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
+                      {STATEMENT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                     </select>
                     <button onClick={() => startEditTransaction(index)} className="rounded-lg border p-2 text-muted-foreground hover:bg-muted">
                       <Pencil size={12} />
@@ -453,7 +442,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
                 <input type="number" step="0.01" value={editForm.amount} onChange={(event) => setEditForm((current) => ({ ...current, amount: event.target.value }))} className="w-full rounded-xl border bg-background px-4 py-2.5 text-sm" />
                 <label className="label-text block">Category</label>
                 <select value={editForm.category} onChange={(event) => setEditForm((current) => ({ ...current, category: event.target.value }))} className="w-full rounded-xl border bg-background px-4 py-2.5 text-sm">
-                  {CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
+                  {STATEMENT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                 </select>
                 <div className="flex gap-2 pt-2">
                   <Button variant="ghost" onClick={() => setEditingTransaction(null)} className="flex-1">Cancel</Button>
