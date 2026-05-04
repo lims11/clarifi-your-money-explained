@@ -211,46 +211,19 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     try {
       try { await saveReminderPreference(); } catch (e) { console.warn('Reminder save skipped:', e); }
 
-      const rows = selectedTransactions.map((transaction) => ({
-        user_id: user.id,
-        account_id: account.id,
-        date: transaction.date,
-        payee: transaction.description,
-        description: transaction.rawDescription,
-        amount: transaction.amount,
-        type: transaction.type,
-        category: transaction.editedCategory || transaction.suggestedCategory || (transaction.type === 'income' ? 'Income' : 'Shopping'),
-        subcategory: transaction.suggestedSubcategory || null,
-        ai_category_confidence: transaction.confidence || null,
-        ai_category_reason: transaction.suggestedCategory ? 'AI categorised from statement' : null,
-      }));
-
-      for (let index = 0; index < rows.length; index += 50) {
-        const batch = rows.slice(index, index + 50);
-        const { error } = await supabase.from('transactions').insert(batch);
-        if (error) throw error;
-      }
-
-      const orderedDates = selectedTransactions.map((transaction) => transaction.date).sort();
-      const { error: uploadError } = await supabase.from('statement_uploads').insert({
-        user_id: user.id,
-        account_id: account.id,
+      const importedCount = await importParsedStatementTransactions({
+        userId: user.id,
+        accountId: account.id,
+        bankId,
         filename: file?.name || 'statement.pdf',
-        bank_id: bankId,
-        file_format: file?.name.split('.').pop()?.toLowerCase() || 'pdf',
-        period_start: orderedDates[0] || null,
-        period_end: orderedDates[orderedDates.length - 1] || null,
-        transactions_found: parsedTransactions.length,
-        transactions_imported: selectedTransactions.length,
-        status: 'complete',
+        transactions: parsedTransactions,
       });
-      if (uploadError) throw uploadError;
 
-      toast.success(`Imported ${selectedTransactions.length} transactions`);
+      toast.success(`Imported ${importedCount} transactions`);
       onClose();
     } catch (error: any) {
-      console.error(error);
-      toast.error(error.message || 'Failed to import statement');
+      console.error('Import upload error:', error);
+      toast.error(getStatementUploadError(error));
     } finally {
       setImporting(false);
     }
