@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { AlertCircle, CheckCircle2, FileText, Loader2, Upload, Wifi, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpcomingBadge } from '@/components/UpcomingBadge';
@@ -9,21 +7,7 @@ import { useDemoMode } from '@/hooks/useDemoMode';
 import { supabase } from '@/integrations/supabase/client';
 import { UK_BANKS } from '@/data/ukBanks';
 import { toast } from 'sonner';
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-
-interface ParsedTransaction {
-  date: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  rawDescription: string;
-  suggestedCategory?: string;
-  suggestedSubcategory?: string;
-  confidence?: number;
-  selected: boolean;
-  editedCategory?: string;
-}
+import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
 
 interface AccountSummary {
   id: string;
@@ -44,7 +28,6 @@ const UPLOAD_FREQUENCIES = [
 ] as const;
 
 const MONTH_DAYS = Array.from({ length: 28 }, (_, index) => index + 1);
-const CATEGORIES = ['Food & Drink', 'Transport', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Travel', 'Education', 'Savings', 'Investment', 'Income', 'Personal'];
 
 function findBankId(institution?: string | null) {
   const normalized = institution?.trim().toLowerCase();
@@ -54,32 +37,6 @@ function findBankId(institution?: string | null) {
     const name = bank.name.toLowerCase();
     return normalized === name || normalized.includes(name) || name.includes(normalized);
   })?.id || 'other';
-}
-
-async function extractPdfText(file: File) {
-  const buffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
-  const pageCount = Math.min(pdf.numPages, 50);
-  const pages: string[] = [];
-
-  for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
-    const page = await pdf.getPage(pageNumber);
-    const content = await page.getTextContent();
-    const text = (content.items as Array<{ str?: string }>)
-      .map((item) => item.str || '')
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    if (text) pages.push(`Page ${pageNumber}\n${text}`);
-  }
-
-  const fullText = pages.join('\n\n').trim();
-  if (fullText.replace(/\s/g, '').length < 50) {
-    throw new Error('This PDF could not be read. Please try a text-based PDF or a CSV export.');
-  }
-
-  return fullText;
 }
 
 export function StatementUploadModal({ account, onClose }: StatementUploadModalProps) {
@@ -92,7 +49,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
   const [file, setFile] = useState<File | null>(null);
   const [parsing, setParsing] = useState(false);
   const [parseError, setParseError] = useState('');
-  const [parsedTransactions, setParsedTransactions] = useState<ParsedTransaction[]>([]);
+  const [parsedTransactions, setParsedTransactions] = useState<ParsedStatementTransaction[]>([]);
   const [parseSummary, setParseSummary] = useState<{ total: number; income: number; expenses: number } | null>(null);
   const [reviewFilter, setReviewFilter] = useState<'all' | 'review' | 'income' | 'expense'>('all');
   const [importing, setImporting] = useState(false);
@@ -175,23 +132,12 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
       // Save reminder preference (non-blocking — don't let it crash the parse)
       try { await saveReminderPreference(); } catch (e) { console.warn('Reminder save skipped:', e); }
 
-      const extension = file.name.split('.').pop()?.toLowerCase();
-      const body = extension === 'pdf'
-        ? { fileType: 'pdf', statementText: await extractPdfText(file), bankId, filename: file.name }
-        : { fileType: 'csv', csvText: await file.text(), bankId, filename: file.name };
-
-      const { data, error } = await supabase.functions.invoke('parse-statement', { body });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
-      setParsedTransactions((data.transactions || []).map((transaction: Omit<ParsedTransaction, 'selected'>) => ({
-        ...transaction,
-        selected: true,
-      })));
-      setParseSummary(data.summary || null);
+      const result = await uploadBankStatementFile(file, bankId);
+      setParsedTransactions(result.transactions);
+      setParseSummary(result.summary);
     } catch (error: any) {
-      console.error(error);
-      setParseError(error.message || 'Failed to parse statement');
+      console.error('Import upload error:', error);
+      setParseError(getStatementUploadError(error));
     } finally {
       setParsing(false);
     }
@@ -265,46 +211,19 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     try {
       try { await saveReminderPreference(); } catch (e) { console.warn('Reminder save skipped:', e); }
 
-      const rows = selectedTransactions.map((transaction) => ({
-        user_id: user.id,
-        account_id: account.id,
-        date: transaction.date,
-        payee: transaction.description,
-        description: transaction.rawDescription,
-        amount: transaction.amount,
-        type: transaction.type,
-        category: transaction.editedCategory || transaction.suggestedCategory || (transaction.type === 'income' ? 'Income' : 'Shopping'),
-        subcategory: transaction.suggestedSubcategory || null,
-        ai_category_confidence: transaction.confidence || null,
-        ai_category_reason: transaction.suggestedCategory ? 'AI categorised from statement' : null,
-      }));
-
-      for (let index = 0; index < rows.length; index += 50) {
-        const batch = rows.slice(index, index + 50);
-        const { error } = await supabase.from('transactions').insert(batch);
-        if (error) throw error;
-      }
-
-      const orderedDates = selectedTransactions.map((transaction) => transaction.date).sort();
-      const { error: uploadError } = await supabase.from('statement_uploads').insert({
-        user_id: user.id,
-        account_id: account.id,
+      const importedCount = await importParsedStatementTransactions({
+        userId: user.id,
+        accountId: account.id,
+        bankId,
         filename: file?.name || 'statement.pdf',
-        bank_id: bankId,
-        file_format: file?.name.split('.').pop()?.toLowerCase() || 'pdf',
-        period_start: orderedDates[0] || null,
-        period_end: orderedDates[orderedDates.length - 1] || null,
-        transactions_found: parsedTransactions.length,
-        transactions_imported: selectedTransactions.length,
-        status: 'complete',
+        transactions: parsedTransactions,
       });
-      if (uploadError) throw uploadError;
 
-      toast.success(`Imported ${selectedTransactions.length} transactions`);
+      toast.success(`Imported ${importedCount} transactions`);
       onClose();
     } catch (error: any) {
-      console.error(error);
-      toast.error(error.message || 'Failed to import statement');
+      console.error('Import upload error:', error);
+      toast.error(getStatementUploadError(error));
     } finally {
       setImporting(false);
     }
@@ -451,7 +370,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
                       onChange={(event) => setParsedTransactions((current) => current.map((row, rowIndex) => rowIndex === index ? { ...row, editedCategory: event.target.value } : row))}
                       className={`min-w-[108px] rounded-lg border-2 bg-background px-2 py-1 text-[11px] ${confidenceClass}`}
                     >
-                      {CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
+                      {STATEMENT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                     </select>
                     <button onClick={() => startEditTransaction(index)} className="rounded-lg border p-2 text-muted-foreground hover:bg-muted">
                       <Pencil size={12} />
@@ -496,7 +415,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
                 <input type="number" step="0.01" value={editForm.amount} onChange={(event) => setEditForm((current) => ({ ...current, amount: event.target.value }))} className="w-full rounded-xl border bg-background px-4 py-2.5 text-sm" />
                 <label className="label-text block">Category</label>
                 <select value={editForm.category} onChange={(event) => setEditForm((current) => ({ ...current, category: event.target.value }))} className="w-full rounded-xl border bg-background px-4 py-2.5 text-sm">
-                  {CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
+                  {STATEMENT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                 </select>
                 <div className="flex gap-2 pt-2">
                   <Button variant="ghost" onClick={() => setEditingTransaction(null)} className="flex-1">Cancel</Button>
