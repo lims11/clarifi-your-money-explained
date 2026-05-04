@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { AlertCircle, CheckCircle2, FileText, Loader2, Upload, Wifi, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpcomingBadge } from '@/components/UpcomingBadge';
@@ -9,21 +7,7 @@ import { useDemoMode } from '@/hooks/useDemoMode';
 import { supabase } from '@/integrations/supabase/client';
 import { UK_BANKS } from '@/data/ukBanks';
 import { toast } from 'sonner';
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-
-interface ParsedTransaction {
-  date: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  rawDescription: string;
-  suggestedCategory?: string;
-  suggestedSubcategory?: string;
-  confidence?: number;
-  selected: boolean;
-  editedCategory?: string;
-}
+import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
 
 interface AccountSummary {
   id: string;
@@ -44,7 +28,6 @@ const UPLOAD_FREQUENCIES = [
 ] as const;
 
 const MONTH_DAYS = Array.from({ length: 28 }, (_, index) => index + 1);
-const CATEGORIES = ['Food & Drink', 'Transport', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Travel', 'Education', 'Savings', 'Investment', 'Income', 'Personal'];
 
 function findBankId(institution?: string | null) {
   const normalized = institution?.trim().toLowerCase();
@@ -54,32 +37,6 @@ function findBankId(institution?: string | null) {
     const name = bank.name.toLowerCase();
     return normalized === name || normalized.includes(name) || name.includes(normalized);
   })?.id || 'other';
-}
-
-async function extractPdfText(file: File) {
-  const buffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
-  const pageCount = Math.min(pdf.numPages, 50);
-  const pages: string[] = [];
-
-  for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
-    const page = await pdf.getPage(pageNumber);
-    const content = await page.getTextContent();
-    const text = (content.items as Array<{ str?: string }>)
-      .map((item) => item.str || '')
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    if (text) pages.push(`Page ${pageNumber}\n${text}`);
-  }
-
-  const fullText = pages.join('\n\n').trim();
-  if (fullText.replace(/\s/g, '').length < 50) {
-    throw new Error('This PDF could not be read. Please try a text-based PDF or a CSV export.');
-  }
-
-  return fullText;
 }
 
 export function StatementUploadModal({ account, onClose }: StatementUploadModalProps) {
@@ -92,7 +49,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
   const [file, setFile] = useState<File | null>(null);
   const [parsing, setParsing] = useState(false);
   const [parseError, setParseError] = useState('');
-  const [parsedTransactions, setParsedTransactions] = useState<ParsedTransaction[]>([]);
+  const [parsedTransactions, setParsedTransactions] = useState<ParsedStatementTransaction[]>([]);
   const [parseSummary, setParseSummary] = useState<{ total: number; income: number; expenses: number } | null>(null);
   const [reviewFilter, setReviewFilter] = useState<'all' | 'review' | 'income' | 'expense'>('all');
   const [importing, setImporting] = useState(false);
