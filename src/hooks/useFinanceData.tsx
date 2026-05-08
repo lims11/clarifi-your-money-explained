@@ -136,9 +136,6 @@ export function useScheduledTransactions() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: sampleScheduledTransactions } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -157,9 +154,6 @@ export function usePulseAlerts() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: samplePulseAlerts } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -179,9 +173,6 @@ export function useUnreadAlertCount() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data === 0) {
-    return { ...liveResult, data: sampleCount } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -200,9 +191,6 @@ export function useChatMessages() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: sampleChatMessages } as typeof liveResult;
-  }
   return liveResult;
 }
 
