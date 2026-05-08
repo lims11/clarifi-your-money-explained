@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { UK_BANKS } from '@/data/ukBanks';
 import { toast } from 'sonner';
 import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AccountSummary {
   id: string;
@@ -43,6 +44,7 @@ function findBankId(institution?: string | null) {
 export function StatementUploadModal({ account, onClose }: StatementUploadModalProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bankId = useMemo(() => findBankId(account.institution), [account.institution]);
   const selectedBank = UK_BANKS.find((bank) => bank.id === bankId);
@@ -223,6 +225,10 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
       });
 
       toast.success(`Imported ${importedCount} transactions`);
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['pulse_alerts'] });
       onClose();
     } catch (error: any) {
       console.error('Import upload error:', error);
