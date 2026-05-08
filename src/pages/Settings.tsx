@@ -39,7 +39,7 @@ export default function SettingsPage() {
   }
 
   const handleSave = async () => {
-    if (demo) { toast.success('Settings saved (demo)'); return; }
+    if (demo) { toast.success('Settings saved'); return; }
     await updateProfile.mutateAsync({ full_name: name, currency });
     toast.success('Settings saved');
   };
