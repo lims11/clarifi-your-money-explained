@@ -368,7 +368,7 @@ export default function GoalsPage() {
                 </div>
 
                 <Button className="w-full" onClick={async () => {
-                  if (demo) { toast.success('Goal created (demo)'); setShowAdd(false); return; }
+                  if (demo) { toast.success('Goal created'); setShowAdd(false); return; }
                   await addGoal.mutateAsync({
                     name: form.name,
                     target_amount: parseFloat(form.target_amount),
@@ -483,7 +483,7 @@ export default function GoalsPage() {
               <div className="flex gap-2 pt-2">
                 <Button variant="ghost" onClick={() => setEditingGoal(null)} className="flex-1">Cancel</Button>
                 <Button className="flex-1" onClick={async () => {
-                  if (demo) { toast.success('Goal updated (demo)'); setEditingGoal(null); return; }
+                  if (demo) { toast.success('Goal updated'); setEditingGoal(null); return; }
                   await updateGoal.mutateAsync({ id: editingGoal.id, ...editForm });
                   toast.success('Goal updated'); setEditingGoal(null);
                 }}>Save changes</Button>
@@ -502,7 +502,7 @@ export default function GoalsPage() {
             <div className="flex gap-2">
               <Button variant="ghost" onClick={() => setDeletingGoal(null)} className="flex-1">Cancel</Button>
               <Button variant="destructive" className="flex-1" onClick={async () => {
-                if (demo) { toast.success('Goal deleted (demo)'); setDeletingGoal(null); return; }
+                if (demo) { toast.success('Goal deleted'); setDeletingGoal(null); return; }
                 await deleteGoal.mutateAsync(deletingGoal.id);
                 toast.success('Goal deleted'); setDeletingGoal(null);
               }}>Delete</Button>
