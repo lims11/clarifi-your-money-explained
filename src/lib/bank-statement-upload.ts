@@ -24,6 +24,40 @@ export interface StatementParseResult {
 
 export const STATEMENT_CATEGORIES = ['Food & Drink', 'Transport', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Travel', 'Education', 'Savings', 'Investment', 'Income', 'Personal'];
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+async function resolveImportAccount(params: { userId: string; accountId: string; accountName: string; institution?: string | null }) {
+  if (UUID_PATTERN.test(params.accountId)) return params.accountId;
+
+  const { data: existing, error: findError } = await supabase
+    .from('accounts')
+    .select('id')
+    .eq('user_id', params.userId)
+    .eq('name', params.accountName)
+    .eq('is_active', true)
+    .limit(1)
+    .maybeSingle();
+  if (findError) throw findError;
+  if (existing?.id) return existing.id;
+
+  const { data: created, error: createError } = await supabase
+    .from('accounts')
+    .insert({
+      user_id: params.userId,
+      name: params.accountName,
+      institution: params.institution || 'Manual',
+      type: 'current',
+      balance: 0,
+      currency: 'GBP',
+      colour: '#7F77DD',
+      is_active: true,
+    })
+    .select('id')
+    .single();
+  if (createError) throw createError;
+  return created.id;
+}
+
 async function extractPdfText(file: File) {
   const buffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
@@ -118,16 +152,19 @@ export async function uploadBankStatementFile(file: File, bankId: string): Promi
 export async function importParsedStatementTransactions(params: {
   userId: string;
   accountId: string;
+  accountName: string;
+  institution?: string | null;
   bankId: string;
   filename: string;
   transactions: ParsedStatementTransaction[];
 }) {
   const selectedTransactions = params.transactions.filter((transaction) => transaction.selected);
   if (selectedTransactions.length === 0) throw new Error('No transactions selected.');
+  const accountId = await resolveImportAccount(params);
 
   const rows = selectedTransactions.map((transaction) => ({
     user_id: params.userId,
-    account_id: params.accountId,
+    account_id: accountId,
     date: transaction.date,
     payee: transaction.description,
     description: transaction.rawDescription,
@@ -150,7 +187,7 @@ export async function importParsedStatementTransactions(params: {
     const { data: account, error: accountError } = await supabase
       .from('accounts')
       .select('balance')
-      .eq('id', params.accountId)
+      .eq('id', accountId)
       .eq('user_id', params.userId)
       .single();
 
@@ -158,7 +195,7 @@ export async function importParsedStatementTransactions(params: {
     const { error: balanceError } = await supabase
       .from('accounts')
       .update({ balance: Number(account.balance) + balanceChange })
-      .eq('id', params.accountId)
+      .eq('id', accountId)
       .eq('user_id', params.userId);
     if (balanceError) throw balanceError;
   }
@@ -166,7 +203,7 @@ export async function importParsedStatementTransactions(params: {
   const orderedDates = selectedTransactions.map((transaction) => transaction.date).sort();
   const { error: uploadError } = await supabase.from('statement_uploads').insert({
     user_id: params.userId,
-    account_id: params.accountId,
+    account_id: accountId,
     filename: params.filename,
     bank_id: params.bankId,
     file_format: params.filename.split('.').pop()?.toLowerCase() || 'pdf',
