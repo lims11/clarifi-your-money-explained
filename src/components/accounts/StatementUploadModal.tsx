@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { UK_BANKS } from '@/data/ukBanks';
 import { toast } from 'sonner';
 import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AccountSummary {
   id: string;
@@ -28,6 +29,7 @@ const UPLOAD_FREQUENCIES = [
 ] as const;
 
 const MONTH_DAYS = Array.from({ length: 28 }, (_, index) => index + 1);
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function findBankId(institution?: string | null) {
   const normalized = institution?.trim().toLowerCase();
@@ -42,6 +44,7 @@ function findBankId(institution?: string | null) {
 export function StatementUploadModal({ account, onClose }: StatementUploadModalProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bankId = useMemo(() => findBankId(account.institution), [account.institution]);
   const selectedBank = UK_BANKS.find((bank) => bank.id === bankId);
@@ -64,7 +67,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     let mounted = true;
 
     const loadPreference = async () => {
-      if (!user || demo) {
+      if (!user || demo || !UUID_PATTERN.test(account.id)) {
         setLoadingPreference(false);
         return;
       }
@@ -94,7 +97,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
   }, [account.id, demo, user]);
 
   const saveReminderPreference = async () => {
-    if (!user || demo) return;
+    if (!user || demo || !UUID_PATTERN.test(account.id)) return;
 
     const payload = {
       user_id: user.id,
@@ -214,12 +217,18 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
       const importedCount = await importParsedStatementTransactions({
         userId: user.id,
         accountId: account.id,
+        accountName: account.name,
+        institution: account.institution,
         bankId,
         filename: file?.name || 'statement.pdf',
         transactions: parsedTransactions,
       });
 
       toast.success(`Imported ${importedCount} transactions`);
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['pulse_alerts'] });
       onClose();
     } catch (error: any) {
       console.error('Import upload error:', error);
@@ -245,7 +254,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
         {parsedTransactions.length === 0 ? (
           <div className="space-y-5">
             <div className="rounded-2xl border bg-muted/30 p-4">
-              <p className="mb-2 text-sm font-medium">Manual Upload Mode</p>
+              <p className="mb-2 text-sm font-medium">Manual Entry</p>
               <p className="text-xs text-muted-foreground">Upload a PDF or CSV statement and Sonfi will use the imported data across transactions, budgets, Pulse, and chat.</p>
             </div>
 
@@ -321,7 +330,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
             <div className="rounded-xl border p-3 opacity-60">
               <div className="flex items-center gap-2">
                 <Wifi size={14} className="text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Bank Sync Mode</span>
+                <span className="text-xs text-muted-foreground">Autosync</span>
                 <UpcomingBadge />
               </div>
             </div>

@@ -11,7 +11,7 @@ export function DataModeSwitcher({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-card rounded-2xl border p-6 w-full max-w-lg" onClick={e => e.stopPropagation()}>
-        <h3 className="text-lg font-semibold mb-1">How do you want to use Sonfi?</h3>
+        <h3 className="text-lg font-semibold mb-1">Choose your data entry</h3>
         <p className="text-sm text-muted-foreground mb-5">You can change this at any time from Settings.</p>
 
         <div className="space-y-3">
@@ -26,13 +26,13 @@ export function DataModeSwitcher({ onClose }: { onClose: () => void }) {
               <span className="text-2xl">📄</span>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">Upload bank statements</span>
+                  <span className="text-sm font-semibold">Manual Entry</span>
                   {mode === 'upload' && (
                     <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-primary/10 text-primary">Current mode</span>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Upload PDF, CSV, or Excel files from your bank. Sonfi analyses and categorises them automatically. You can edit any transaction or budget inline.
+                  Upload PDF or CSV statements from your bank. Sonfi analyses and categorises them automatically. You can edit any transaction or budget inline.
                 </p>
               </div>
             </div>
@@ -44,11 +44,11 @@ export function DataModeSwitcher({ onClose }: { onClose: () => void }) {
               <span className="text-2xl">🏦</span>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">Live bank sync</span>
+                  <span className="text-sm font-semibold">Autosync</span>
                   <UpcomingBadge />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Connect directly to your bank for automatic real-time transaction sync. No manual uploads needed.
+                  Connect directly to your bank for automatic transaction sync. No manual uploads needed.
                 </p>
                 <div className="flex items-center gap-2 mt-2">
                   <input
@@ -66,7 +66,7 @@ export function DataModeSwitcher({ onClose }: { onClose: () => void }) {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (waitlistEmail) {
-                        toast.success('You\'re on the waitlist! We\'ll email you when bank sync launches.');
+                        toast.success('You\'re on the waitlist! We\'ll email you when Autosync launches.');
                         setWaitlistEmail('');
                       }
                     }}

@@ -215,7 +215,7 @@ export default function TransactionsPage() {
                           </button>
                           <button onClick={() => {
                             if (confirm('Delete this transaction?')) {
-                              if (demo) { toast.success('Transaction deleted (demo)'); setExpandedTx(null); return; }
+                              if (demo) { toast.success('Transaction deleted'); setExpandedTx(null); return; }
                               toast.success('Transaction deleted');
                             }
                           }}
@@ -257,7 +257,7 @@ export default function TransactionsPage() {
               <div className="flex gap-2">
                 <Button variant="ghost" onClick={() => setShowAdd(false)} className="flex-1">Cancel</Button>
                 <Button className="flex-1" disabled={!txnForm.payee || !txnForm.amount || !txnForm.account_id} onClick={async () => {
-                  if (demo) { toast.success('Transaction added (demo)'); setShowAdd(false); return; }
+                  if (demo) { toast.success('Transaction added'); setShowAdd(false); return; }
                   const amt = parseFloat(txnForm.amount);
                   await addTransaction.mutateAsync({
                     account_id: txnForm.account_id,
@@ -302,7 +302,7 @@ export default function TransactionsPage() {
               <div className="flex gap-2 pt-2">
                 <Button variant="ghost" onClick={() => setEditingTx(null)} className="flex-1">Cancel</Button>
                 <Button className="flex-1" onClick={() => {
-                  if (demo) { toast.success('Transaction updated (demo)'); setEditingTx(null); return; }
+                  if (demo) { toast.success('Transaction updated'); setEditingTx(null); return; }
                   toast.success('Transaction updated'); setEditingTx(null);
                 }}>Save changes</Button>
               </div>

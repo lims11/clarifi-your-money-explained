@@ -21,17 +21,6 @@ function useDemoQuery<T>(key: string[], data: T) {
   });
 }
 
-// Returns sample data if live result is empty
-function useFallback<T extends any[]>(liveResult: ReturnType<typeof useQuery>, sampleData: T, demo: boolean): ReturnType<typeof useQuery> {
-  const demoResult = useDemoQuery(['fallback', ...((liveResult as any).queryKey || [])], sampleData);
-  if (demo) return demoResult as any;
-  // If live data loaded and is empty, return sample data
-  if (!liveResult.isLoading && liveResult.data && (liveResult.data as any[]).length === 0) {
-    return { ...liveResult, data: sampleData } as any;
-  }
-  return liveResult as any;
-}
-
 export function useAccounts() {
   const { user } = useAuth();
   const demo = useDemoMode();
@@ -47,9 +36,6 @@ export function useAccounts() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: sampleAccounts } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -67,9 +53,6 @@ export function useAllAccounts() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: sampleAccounts } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -96,9 +79,6 @@ export function useTransactions(filters?: { startDate?: string; accountId?: stri
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: filteredSample } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -121,9 +101,6 @@ export function useBudgets() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: sampleBudgets } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -141,9 +118,6 @@ export function useGoals() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: sampleGoals } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -162,9 +136,6 @@ export function useScheduledTransactions() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: sampleScheduledTransactions } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -183,9 +154,6 @@ export function usePulseAlerts() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: samplePulseAlerts } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -205,9 +173,6 @@ export function useUnreadAlertCount() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data === 0) {
-    return { ...liveResult, data: sampleCount } as typeof liveResult;
-  }
   return liveResult;
 }
 
@@ -226,9 +191,6 @@ export function useChatMessages() {
     enabled: !!user && !demo,
   });
   if (demo) return demoResult;
-  if (!liveResult.isLoading && liveResult.data && liveResult.data.length === 0) {
-    return { ...liveResult, data: sampleChatMessages } as typeof liveResult;
-  }
   return liveResult;
 }
 

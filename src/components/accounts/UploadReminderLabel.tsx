@@ -36,6 +36,8 @@ function formatShortDate(date: Date) {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export function UploadReminderLabel({ accountId, onManage }: UploadReminderLabelProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
@@ -46,7 +48,7 @@ export function UploadReminderLabel({ accountId, onManage }: UploadReminderLabel
     let mounted = true;
 
     const load = async () => {
-      if (!user || demo) {
+      if (!user || demo || !UUID_PATTERN.test(accountId)) {
         setLoading(false);
         return;
       }
