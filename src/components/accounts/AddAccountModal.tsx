@@ -348,7 +348,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
         {step === 3 && (
           <div className="space-y-4">
             <p className="text-sm font-medium">Upload your {bankName} statement</p>
-            <p className="text-xs text-muted-foreground">Upload a CSV file from your bank. Sonfi will read and categorise your transactions automatically using AI.</p>
+            <p className="text-xs text-muted-foreground">Upload a PDF or CSV file from your bank. Sonfi will read and categorise your transactions automatically using AI.</p>
 
             {selectedBank?.pdfHint && (
               <div className="rounded-lg bg-primary/5 border border-primary/20 p-3">
@@ -358,10 +358,9 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
 
             {/* Supported formats */}
             <div className="flex flex-wrap gap-1">
-              {['CSV'].map(f => (
+              {['PDF', 'CSV'].map(f => (
                 <span key={f} className="text-[10px] font-medium uppercase px-2 py-0.5 rounded bg-muted text-muted-foreground">{f}</span>
               ))}
-              <span className="text-[10px] text-muted-foreground ml-1">(PDF support coming soon)</span>
             </div>
 
             {/* File drop zone */}
@@ -373,7 +372,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
                 file ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30 hover:bg-muted/50'
               }`}
             >
-              <input ref={fileInputRef} type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
+              <input ref={fileInputRef} type="file" accept=".csv,.pdf,application/pdf,text/csv" onChange={handleFileChange} className="hidden" />
               {file ? (
                 <div className="space-y-2">
                   <FileText size={24} className="mx-auto text-primary" />
@@ -385,7 +384,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
                 <div className="space-y-2">
                   <Upload size={24} className="mx-auto text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">Drop your statement here or click to browse</p>
-                  <p className="text-[11px] text-muted-foreground">CSV files supported</p>
+                  <p className="text-[11px] text-muted-foreground">PDF and CSV files supported</p>
                 </div>
               )}
             </div>
