@@ -145,7 +145,7 @@ export default function AccountsPage() {
                 <div className="flex gap-2">
                   <Button variant="ghost" onClick={() => setShowAddTxn(false)} className="flex-1">Cancel</Button>
                   <Button className="flex-1" disabled={!txnForm.payee || !txnForm.amount} onClick={async () => {
-                    if (demo) { toast.success('Transaction added (demo)'); setShowAddTxn(false); return; }
+                    if (demo) { toast.success('Transaction added'); setShowAddTxn(false); return; }
                     const amt = parseFloat(txnForm.amount);
                     await addTransaction.mutateAsync({
                       account_id: id!,
@@ -331,7 +331,7 @@ export default function AccountsPage() {
               <div className="flex gap-2 pt-2">
                 <Button variant="ghost" onClick={() => setEditingAccount(null)} className="flex-1">Cancel</Button>
                 <Button className="flex-1" onClick={async () => {
-                  if (demo) { toast.success('Account updated (demo)'); setEditingAccount(null); return; }
+                  if (demo) { toast.success('Account updated'); setEditingAccount(null); return; }
                   await updateAccount.mutateAsync({ id: editingAccount.id, ...editForm });
                   toast.success('Account updated'); setEditingAccount(null);
                 }}>Save changes</Button>
@@ -352,7 +352,7 @@ export default function AccountsPage() {
             <div className="flex gap-2">
               <Button variant="ghost" onClick={() => { setDeletingAccount(null); setDeleteConfirmName(''); }} className="flex-1">Cancel</Button>
               <Button variant="destructive" className="flex-1" disabled={deleteConfirmName !== deletingAccount.name} onClick={async () => {
-                if (demo) { toast.success('Account deleted (demo)'); setDeletingAccount(null); setDeleteConfirmName(''); return; }
+                if (demo) { toast.success('Account deleted'); setDeletingAccount(null); setDeleteConfirmName(''); return; }
                 await deleteAccount.mutateAsync(deletingAccount.id);
                 toast.success('Account deleted'); setDeletingAccount(null); setDeleteConfirmName('');
               }}>Delete</Button>
