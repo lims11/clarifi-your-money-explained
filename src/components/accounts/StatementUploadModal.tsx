@@ -247,7 +247,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
         {parsedTransactions.length === 0 ? (
           <div className="space-y-5">
             <div className="rounded-2xl border bg-muted/30 p-4">
-              <p className="mb-2 text-sm font-medium">Manual Upload Mode</p>
+              <p className="mb-2 text-sm font-medium">Manual Entry</p>
               <p className="text-xs text-muted-foreground">Upload a PDF or CSV statement and Sonfi will use the imported data across transactions, budgets, Pulse, and chat.</p>
             </div>
 
@@ -323,7 +323,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
             <div className="rounded-xl border p-3 opacity-60">
               <div className="flex items-center gap-2">
                 <Wifi size={14} className="text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Bank Sync Mode</span>
+                <span className="text-xs text-muted-foreground">Autosync</span>
                 <UpcomingBadge />
               </div>
             </div>
