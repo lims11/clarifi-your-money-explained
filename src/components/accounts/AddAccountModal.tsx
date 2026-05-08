@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, Search, Upload, Wifi, CreditCard, Landmark, PiggyBank, Home, TrendingUp, Bitcoin, Wallet, Briefcase, FileText, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
 
 const ACCOUNT_TYPES = [
   { id: 'current', label: 'Current Account', icon: Landmark, desc: 'Everyday spending' },
@@ -26,18 +27,7 @@ const UPLOAD_FREQUENCIES = [
   { id: 'adhoc', label: 'Ad hoc' },
 ];
 
-interface ParsedTransaction {
-  date: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  rawDescription: string;
-  suggestedCategory?: string;
-  suggestedSubcategory?: string;
-  confidence?: number;
-  selected: boolean;
-  editedCategory?: string;
-}
+type ParsedTransaction = ParsedStatementTransaction;
 
 interface AddAccountModalProps {
   onClose: () => void;
@@ -165,27 +155,13 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
     setParseError('');
 
     try {
-      const text = await file.text();
-
-      const { data: result, error } = await supabase.functions.invoke('parse-statement', {
-        body: { csvText: text, bankId },
-      });
-
-      if (error) throw error;
-      if (result.error) throw new Error(result.error);
-
-      const txns: ParsedTransaction[] = (result.transactions || []).map((t: any) => ({
-        ...t,
-        selected: true,
-        editedCategory: undefined,
-      }));
-
-      setParsedTransactions(txns);
+      const result = await uploadBankStatementFile(file, bankId);
+      setParsedTransactions(result.transactions);
       setParseSummary(result.summary);
       setStep(4);
     } catch (err: any) {
       console.error(err);
-      setParseError(err.message || 'Failed to parse statement');
+      setParseError(getStatementUploadError(err));
     } finally {
       setParsing(false);
     }
@@ -218,58 +194,28 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
 
     setImporting(true);
     try {
-      const accountId = savedAccountId;
-      if (!accountId || !user) throw new Error('No account ID');
-
-      const rows = toImport.map(t => ({
-        account_id: accountId,
-        user_id: user.id,
-        date: t.date,
-        payee: t.description,
-        description: t.rawDescription,
-        amount: t.amount,
-        type: t.type,
-        category: t.editedCategory || t.suggestedCategory || (t.type === 'income' ? 'Income' : 'Shopping'),
-        subcategory: t.suggestedSubcategory || null,
-        ai_category_confidence: t.confidence || null,
-        ai_category_reason: t.suggestedCategory ? `AI categorised from statement` : null,
-      }));
-
-      // Insert in batches of 50
-      for (let i = 0; i < rows.length; i += 50) {
-        const batch = rows.slice(i, i + 50);
-        const { error } = await supabase.from('transactions').insert(batch);
-        if (error) throw error;
-      }
-
-      // Update account balance based on transactions
-      const totalChange = toImport.reduce((s, t) => s + t.amount, 0);
-      const currentBal = parseFloat(balance) || 0;
-      await supabase.from('accounts').update({ balance: currentBal + totalChange }).eq('id', accountId);
-
-      // Record the upload
-      await supabase.from('statement_uploads').insert({
-        user_id: user.id,
-        account_id: accountId,
+      if (!savedAccountId || !user) throw new Error('Create an account before importing this statement.');
+      const importedCount = await importParsedStatementTransactions({
+        userId: user.id,
+        accountId: savedAccountId,
+        accountName: nickname || `${bankName} ${accountType}`,
+        institution: bankName,
+        bankId,
         filename: file?.name || 'statement.csv',
-        bank_id: bankId,
-        file_format: file?.name.split('.').pop() || 'csv',
-        transactions_found: parsedTransactions.length,
-        transactions_imported: toImport.length,
-        status: 'complete',
+        transactions: parsedTransactions,
       });
 
-      toast.success(`Imported ${toImport.length} transactions!`);
+      toast.success(`Imported ${importedCount} transactions!`);
       onClose();
     } catch (err: any) {
       console.error(err);
-      toast.error('Failed to import: ' + (err.message || 'Unknown error'));
+      toast.error(getStatementUploadError(err));
     } finally {
       setImporting(false);
     }
   };
 
-  const CATEGORIES = ['Food & Drink', 'Transport', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Travel', 'Education', 'Savings', 'Investment', 'Income', 'Personal'];
+  const CATEGORIES = STATEMENT_CATEGORIES;
 
   const fmt = (n: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(n);
 
