@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, MessageSquare, Wallet, ArrowLeftRight, PieChart, Target, Bell, Settings, Sparkles, BarChart2, Calendar, Gift, MoreHorizontal, X } from 'lucide-react';
 import { useUnreadAlertCount } from '@/hooks/useFinanceData';
 import { useProfile } from '@/hooks/useProfile';
-import { useDemoMode, useDemoPrefix } from '@/hooks/useDemoMode';
+import { useDemoPrefix } from '@/hooks/useDemoMode';
 import sonfiLogo from '@/assets/sonfi-logo-horizontal.png';
 
 const baseNavItems = [
@@ -22,14 +22,12 @@ export function AppSidebar() {
   const location = useLocation();
   const { data: unreadCount } = useUnreadAlertCount();
   const { data: profile } = useProfile();
-  const demo = useDemoMode();
   const prefix = useDemoPrefix();
 
   return (
     <aside className="hidden lg:flex flex-col w-[220px] min-h-screen bg-card border-r fixed left-0 top-0 z-30">
       <div className="p-5 pb-4 flex items-center gap-2">
         <img src={sonfiLogo} alt="Sonfi" className="h-7" />
-        {demo && <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-amber/20 text-amber font-medium">DEMO</span>}
       </div>
       <nav className="flex-1 px-3 space-y-0.5">
         {baseNavItems.map(item => {
@@ -62,7 +60,7 @@ export function AppSidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{profile?.full_name || 'User'}</p>
-            <p className="text-[11px] text-muted-foreground">{demo ? 'Demo mode' : 'Free plan'}</p>
+            <p className="text-[11px] text-muted-foreground">Free plan</p>
           </div>
         </div>
       </div>
@@ -88,7 +86,6 @@ const mobileMoreItems = [
 
 export function MobileNav() {
   const location = useLocation();
-  const demo = useDemoMode();
   const prefix = useDemoPrefix();
   const [moreOpen, setMoreOpen] = useState(false);
 
