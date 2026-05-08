@@ -91,7 +91,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
   // Save account first, then proceed to upload
   const handleSaveAndUpload = async () => {
     if (demo) {
-      toast.success('Account added (demo)');
+      toast.success('Account added');
       setStep(3);
       return;
     }
@@ -121,7 +121,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
   // Save account without upload (skip)
   const handleSaveSkip = async () => {
     if (demo) {
-      toast.success('Account added (demo)');
+      toast.success('Account added');
       onClose();
       return;
     }
