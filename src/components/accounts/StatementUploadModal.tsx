@@ -214,6 +214,8 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
       const importedCount = await importParsedStatementTransactions({
         userId: user.id,
         accountId: account.id,
+        accountName: account.name,
+        institution: account.institution,
         bankId,
         filename: file?.name || 'statement.pdf',
         transactions: parsedTransactions,
