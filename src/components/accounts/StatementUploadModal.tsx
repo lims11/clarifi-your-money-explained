@@ -28,6 +28,7 @@ const UPLOAD_FREQUENCIES = [
 ] as const;
 
 const MONTH_DAYS = Array.from({ length: 28 }, (_, index) => index + 1);
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function findBankId(institution?: string | null) {
   const normalized = institution?.trim().toLowerCase();
@@ -64,7 +65,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     let mounted = true;
 
     const loadPreference = async () => {
-      if (!user || demo) {
+      if (!user || demo || !UUID_PATTERN.test(account.id)) {
         setLoadingPreference(false);
         return;
       }
@@ -94,7 +95,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
   }, [account.id, demo, user]);
 
   const saveReminderPreference = async () => {
-    if (!user || demo) return;
+    if (!user || demo || !UUID_PATTERN.test(account.id)) return;
 
     const payload = {
       user_id: user.id,
