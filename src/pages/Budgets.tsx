@@ -425,7 +425,7 @@ export default function BudgetsPage() {
               <div className="flex gap-2">
                 <Button variant="ghost" onClick={() => setShowAdd(false)} className="flex-1">Cancel</Button>
                 <Button className="flex-1" disabled={!form.name || !form.amount} onClick={async () => {
-                  if (demo) { toast.success('Budget created (demo)'); setShowAdd(false); return; }
+                  if (demo) { toast.success('Budget created'); setShowAdd(false); return; }
                   await addBudget.mutateAsync({ name: form.name, category: form.category, amount: parseFloat(form.amount), period: form.period, colour: form.colour });
                   toast.success('Budget created'); setShowAdd(false); setForm({ name: '', category: 'Food & Drink', amount: '', period: 'monthly', colour: '#7F77DD' });
                 }}>Add</Button>
@@ -459,7 +459,7 @@ export default function BudgetsPage() {
               <div className="flex gap-2 pt-2">
                 <Button variant="ghost" onClick={() => setEditingBudget(null)} className="flex-1">Cancel</Button>
                 <Button className="flex-1" onClick={async () => {
-                  if (demo) { toast.success('Budget updated (demo)'); setEditingBudget(null); return; }
+                  if (demo) { toast.success('Budget updated'); setEditingBudget(null); return; }
                   await updateBudget.mutateAsync({ id: editingBudget.id, ...editForm });
                   toast.success('Budget updated'); setEditingBudget(null);
                 }}>Save changes</Button>
@@ -478,7 +478,7 @@ export default function BudgetsPage() {
             <div className="flex gap-2">
               <Button variant="ghost" onClick={() => setDeletingBudget(null)} className="flex-1">Cancel</Button>
               <Button variant="destructive" className="flex-1" onClick={async () => {
-                if (demo) { toast.success('Budget deleted (demo)'); setDeletingBudget(null); return; }
+                if (demo) { toast.success('Budget deleted'); setDeletingBudget(null); return; }
                 await deleteBudget.mutateAsync(deletingBudget.id);
                 toast.success('Budget deleted'); setDeletingBudget(null);
               }}>Delete</Button>
