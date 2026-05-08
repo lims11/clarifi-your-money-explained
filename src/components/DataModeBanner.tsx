@@ -16,14 +16,14 @@ export function DataModeBanner() {
           <Upload size={14} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-indigo-900 dark:text-indigo-200">Statement Upload Mode</p>
+          <p className="text-xs font-semibold text-indigo-900 dark:text-indigo-200">Manual Entry</p>
           <p className="text-[11px] text-indigo-600 dark:text-indigo-400 hidden sm:block">Upload your bank statements to let Sonfi analyse your finances.</p>
         </div>
         <button
           onClick={() => setShowSwitcher(true)}
           className="flex items-center gap-1 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:underline flex-shrink-0"
         >
-          Switch mode <ChevronRight size={12} />
+          Change <ChevronRight size={12} />
         </button>
       </div>
       {showSwitcher && <DataModeSwitcher onClose={() => setShowSwitcher(false)} />}
