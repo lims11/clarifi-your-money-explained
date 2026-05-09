@@ -299,9 +299,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-muted/50">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: selectedBank?.colour || '#7F77DD' }}>
-                    {selectedBank?.letter || '?'}
-                  </div>
+                  <BankLogo bankId={bankId} size={40} />
                   <div className="flex-1">
                     <p className="text-sm font-medium">{bankId === 'other' ? 'Custom bank' : selectedBank?.name}</p>
                     <p className="text-[11px] text-muted-foreground">{ACCOUNT_TYPES.find(t => t.id === accountType)?.label}</p>
