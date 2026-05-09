@@ -55,17 +55,14 @@ export default function AccountsPage() {
     const account = accounts.find(a => a.id === id);
     if (!account) return <div className="p-8 text-center text-muted-foreground">Account not found</div>;
     const accountTxns = allTransactions?.filter(t => t.account_id === id) ?? [];
-    const logo = institutionLogos[account.institution || ''];
 
     return (
       <div className="p-5 lg:p-8 max-w-4xl mx-auto">
         <Link to="/accounts" className="text-xs text-primary hover:underline mb-4 block">← All accounts</Link>
         <div className="sonfi-card mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-medium"
-              style={{ backgroundColor: logo?.bg || account.colour || '#7F77DD', color: logo?.dark ? '#1A1A1A' : '#fff' }}>
-              {logo?.letter || (account.institution?.[0] || 'A')}
-            </div>
+            <BankLogo institution={account.institution} fallbackColour={account.colour} size={48} rounded="xl" />
+
             <div className="flex-1">
               <h1 className="text-xl font-medium">{account.name}</h1>
               <p className="text-sm text-muted-foreground">{account.institution} · {account.type.replace('_', ' ')}</p>
