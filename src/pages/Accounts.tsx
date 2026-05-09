@@ -34,6 +34,7 @@ export default function AccountsPage() {
   const demo = useDemoMode();
 
   const [showAddAccount, setShowAddAccount] = useState(false);
+  const [showAutosync, setShowAutosync] = useState(false);
   const [showAddTxn, setShowAddTxn] = useState(false);
   const [form, setForm] = useState({ name: '', type: 'current', institution: '', balance: '', colour: '#7F77DD' });
   const [txnForm, setTxnForm] = useState({ payee: '', amount: '', type: 'expense', category: 'Shopping', date: new Date().toISOString().split('T')[0], description: '' });
