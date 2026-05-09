@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Plus, ArrowUpRight, ArrowDownRight, MoreHorizontal, Pencil, Trash2, Upload, CalendarClock } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownRight, MoreHorizontal, Pencil, Trash2, Upload, CalendarClock, Wifi } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDate } from '@/lib/finance';
 import { useAccounts, useTransactions, useAddAccount, useAddTransaction, useUpdateAccount, useDeleteAccount } from '@/hooks/useFinanceData';
@@ -10,24 +10,9 @@ import { toast } from 'sonner';
 import { ResponsiveContainer, LineChart, Line } from 'recharts';
 import { AddAccountModal } from '@/components/accounts/AddAccountModal';
 import { StatementUploadModal } from '@/components/accounts/StatementUploadModal';
+import { AutosyncModal } from '@/components/accounts/AutosyncModal';
 import { UploadReminderLabel } from '@/components/accounts/UploadReminderLabel';
-
-const institutionLogos: Record<string, { bg: string; letter: string; dark?: boolean }> = {
-  'Barclays': { bg: '#00AEEF', letter: 'B' },
-  'HSBC': { bg: '#DB0011', letter: 'H' },
-  'NatWest': { bg: '#4A0E8F', letter: 'N' },
-  'Lloyds': { bg: '#006A4D', letter: 'L' },
-  'Santander': { bg: '#EC0000', letter: 'S' },
-  'Monzo': { bg: '#FF3464', letter: 'M' },
-  'Starling': { bg: '#6935D3', letter: 'S' },
-  'Chase UK': { bg: '#117ACA', letter: 'C' },
-  'Halifax': { bg: '#005EB8', letter: 'H' },
-  'American Express': { bg: '#007BC1', letter: 'A' },
-  'Goldman Sachs': { bg: '#1A1A1A', letter: 'G' },
-  'Coinbase': { bg: '#0052FF', letter: 'C' },
-  'Binance': { bg: '#F3BA2F', letter: 'B', dark: true },
-  'Vanguard': { bg: '#961A1A', letter: 'V' },
-};
+import { BankLogo } from '@/components/BankLogo';
 
 const typeLabels: Record<string, string> = {
   current: 'Current accounts', savings: 'Savings accounts', credit_card: 'Credit cards',
