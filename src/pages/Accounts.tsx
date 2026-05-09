@@ -174,7 +174,12 @@ export default function AccountsPage() {
     <div className="p-5 lg:p-8 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-medium">Accounts</h1>
-        <Button size="sm" onClick={() => setShowAddAccount(true)}><Plus size={16} /> Add account</Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => setShowAutosync(true)}>
+            <Wifi size={14} /> Autosync
+          </Button>
+          <Button size="sm" onClick={() => setShowAddAccount(true)}><Plus size={16} /> Add account</Button>
+        </div>
       </div>
 
       {(!accounts || accounts.length === 0) ? (
