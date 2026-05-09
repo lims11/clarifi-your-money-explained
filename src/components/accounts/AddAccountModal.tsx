@@ -8,6 +8,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, Search, Upload, Wifi, CreditCard, Landmark, PiggyBank, Home, TrendingUp, Bitcoin, Wallet, Briefcase, FileText, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
+import { detectSubscriptionsAndAlert } from '@/lib/detect-subscriptions';
+import { BankLogo } from '@/components/BankLogo';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ACCOUNT_TYPES = [
   { id: 'current', label: 'Current Account', icon: Landmark, desc: 'Everyday spending' },
