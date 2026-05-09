@@ -290,9 +290,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
                   {filteredBanks.map(bank => (
                     <button key={bank.id} onClick={() => handleSelectBank(bank.id)}
                       className="flex flex-col items-center gap-2 p-3 rounded-xl border hover:border-primary/30 hover:bg-primary/5 transition-all">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: bank.colour }}>
-                        {bank.letter}
-                      </div>
+                      <BankLogo bankId={bank.id} size={40} />
                       <span className="text-[11px] font-medium text-center leading-tight">{bank.name}</span>
                     </button>
                   ))}
