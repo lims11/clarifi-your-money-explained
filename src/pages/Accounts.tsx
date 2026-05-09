@@ -196,7 +196,6 @@ export default function AccountsPage() {
                 </div>
                 <div className="space-y-2">
                   {typeAccounts.map(a => {
-                    const logo = institutionLogos[a.institution || ''];
                     const monthIncome = allTransactions?.filter(t => t.account_id === a.id && t.type === 'income').reduce((s, t) => s + Number(t.amount), 0) ?? 0;
                     const monthExpenses = Math.abs(allTransactions?.filter(t => t.account_id === a.id && t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0) ?? 0);
                     const spark = Array.from({ length: 7 }, (_, i) => ({ v: Number(a.balance) + (Math.random() - 0.5) * 200 * (7 - i) }));
@@ -204,9 +203,8 @@ export default function AccountsPage() {
                     return (
                       <div key={a.id} className="sonfi-card hover:border-primary/20 transition-colors">
                         <div className="flex items-center gap-4">
-                          <Link to={`/accounts/${a.id}`} className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium flex-shrink-0"
-                            style={{ backgroundColor: logo?.bg || a.colour || '#7F77DD', color: logo?.dark ? '#1A1A1A' : '#fff' }}>
-                            {logo?.letter || (a.institution?.[0] || 'A')}
+                          <Link to={`/accounts/${a.id}`} className="flex-shrink-0">
+                            <BankLogo institution={a.institution} fallbackColour={a.colour} size={40} rounded="xl" />
                           </Link>
                           <Link to={`/accounts/${a.id}`} className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
