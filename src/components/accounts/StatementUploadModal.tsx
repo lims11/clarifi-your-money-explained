@@ -349,6 +349,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
                 <span className="font-mono opacity-70"> · {account.id.slice(0, 8)}…</span>
               </p>
             </div>
+            {parseSummary && (
               <div className="flex flex-wrap gap-4 rounded-xl bg-muted/50 p-3 text-xs">
                 <span>{parseSummary.total} transactions</span>
                 <span className="amount-positive">In: {formatAmount(parseSummary.income)}</span>
