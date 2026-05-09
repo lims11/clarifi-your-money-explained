@@ -436,6 +436,13 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
         {/* STEP 4: Review parsed transactions */}
         {step === 4 && (
           <div className="space-y-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs">
+              <p className="font-medium">Importing into</p>
+              <p className="text-muted-foreground">
+                {nickname || `${bankName} ${accountType}`}{bankName ? ` · ${bankName}` : ''}
+                {savedAccountId && <span className="font-mono opacity-70"> · {savedAccountId.slice(0, 8)}…</span>}
+              </p>
+            </div>
             {/* Summary bar */}
             {parseSummary && (
               <div className="flex flex-wrap gap-4 text-xs p-3 rounded-xl bg-muted/50">
