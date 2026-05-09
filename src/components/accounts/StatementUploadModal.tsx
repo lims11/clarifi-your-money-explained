@@ -246,9 +246,12 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div className="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-2xl border bg-card p-6" onClick={(event) => event.stopPropagation()}>
         <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold">Upload statement</h3>
-            <p className="text-xs text-muted-foreground">{account.name} · {account.institution || 'Manual account'}</p>
+          <div className="flex items-center gap-3">
+            <BankLogo institution={account.institution} size={40} rounded="xl" />
+            <div>
+              <h3 className="text-lg font-semibold">Upload statement</h3>
+              <p className="text-xs text-muted-foreground">{account.name} · {account.institution || 'Manual account'}</p>
+            </div>
           </div>
           <Button variant="ghost" onClick={onClose}>Close</Button>
         </div>
