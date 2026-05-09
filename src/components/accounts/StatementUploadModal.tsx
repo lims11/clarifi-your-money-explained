@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { UK_BANKS } from '@/data/ukBanks';
 import { toast } from 'sonner';
 import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
+import { detectSubscriptionsAndAlert } from '@/lib/detect-subscriptions';
+import { BankLogo } from '@/components/BankLogo';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface AccountSummary {
