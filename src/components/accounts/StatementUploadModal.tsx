@@ -227,10 +227,10 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
       });
 
       toast.success(`Imported ${importedCount} transactions`);
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
-      queryClient.invalidateQueries({ queryKey: ['pulse_alerts'] });
+      try { await detectSubscriptionsAndAlert(user.id); } catch (e) { console.warn('Subscription scan skipped', e); }
+      ['transactions', 'accounts', 'budgets', 'pulse_alerts', 'chat_messages', 'subscriptions', 'net_worth_history'].forEach(k =>
+        queryClient.invalidateQueries({ queryKey: [k] })
+      );
       onClose();
     } catch (error: any) {
       console.error('Import upload error:', error);
