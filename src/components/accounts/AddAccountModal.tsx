@@ -210,6 +210,10 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
       });
 
       toast.success(`Imported ${importedCount} transactions!`);
+      try { await detectSubscriptionsAndAlert(user.id); } catch (e) { console.warn('Subscription scan skipped', e); }
+      ['transactions', 'accounts', 'budgets', 'pulse_alerts', 'chat_messages', 'subscriptions', 'net_worth_history'].forEach(k =>
+        queryClient.invalidateQueries({ queryKey: [k] })
+      );
       onClose();
     } catch (err: any) {
       console.error(err);
