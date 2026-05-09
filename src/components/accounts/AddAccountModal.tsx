@@ -41,6 +41,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   // Step navigation
   const [step, setStep] = useState(1);
