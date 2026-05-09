@@ -342,7 +342,13 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
           </div>
         ) : (
           <div className="space-y-4">
-            {parseSummary && (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs">
+              <p className="font-medium">Importing into</p>
+              <p className="text-muted-foreground">
+                {account.name}{account.institution ? ` · ${account.institution}` : ''}
+                <span className="font-mono opacity-70"> · {account.id.slice(0, 8)}…</span>
+              </p>
+            </div>
               <div className="flex flex-wrap gap-4 rounded-xl bg-muted/50 p-3 text-xs">
                 <span>{parseSummary.total} transactions</span>
                 <span className="amount-positive">In: {formatAmount(parseSummary.income)}</span>
