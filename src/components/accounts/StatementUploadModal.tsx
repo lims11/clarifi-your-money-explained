@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { UK_BANKS } from '@/data/ukBanks';
 import { toast } from 'sonner';
 import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
+import { detectSubscriptionsAndAlert } from '@/lib/detect-subscriptions';
+import { BankLogo } from '@/components/BankLogo';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface AccountSummary {
@@ -225,10 +227,10 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
       });
 
       toast.success(`Imported ${importedCount} transactions`);
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
-      queryClient.invalidateQueries({ queryKey: ['pulse_alerts'] });
+      try { await detectSubscriptionsAndAlert(user.id); } catch (e) { console.warn('Subscription scan skipped', e); }
+      ['transactions', 'accounts', 'budgets', 'pulse_alerts', 'chat_messages', 'subscriptions', 'net_worth_history'].forEach(k =>
+        queryClient.invalidateQueries({ queryKey: [k] })
+      );
       onClose();
     } catch (error: any) {
       console.error('Import upload error:', error);
@@ -244,9 +246,12 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div className="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-2xl border bg-card p-6" onClick={(event) => event.stopPropagation()}>
         <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold">Upload statement</h3>
-            <p className="text-xs text-muted-foreground">{account.name} · {account.institution || 'Manual account'}</p>
+          <div className="flex items-center gap-3">
+            <BankLogo institution={account.institution} size={40} rounded="xl" />
+            <div>
+              <h3 className="text-lg font-semibold">Upload statement</h3>
+              <p className="text-xs text-muted-foreground">{account.name} · {account.institution || 'Manual account'}</p>
+            </div>
           </div>
           <Button variant="ghost" onClick={onClose}>Close</Button>
         </div>
@@ -337,6 +342,13 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
           </div>
         ) : (
           <div className="space-y-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs">
+              <p className="font-medium">Importing into</p>
+              <p className="text-muted-foreground">
+                {account.name}{account.institution ? ` · ${account.institution}` : ''}
+                <span className="font-mono opacity-70"> · {account.id.slice(0, 8)}…</span>
+              </p>
+            </div>
             {parseSummary && (
               <div className="flex flex-wrap gap-4 rounded-xl bg-muted/50 p-3 text-xs">
                 <span>{parseSummary.total} transactions</span>

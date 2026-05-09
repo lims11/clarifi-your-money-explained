@@ -8,6 +8,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, Search, Upload, Wifi, CreditCard, Landmark, PiggyBank, Home, TrendingUp, Bitcoin, Wallet, Briefcase, FileText, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { getStatementUploadError, importParsedStatementTransactions, STATEMENT_CATEGORIES, uploadBankStatementFile, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
+import { detectSubscriptionsAndAlert } from '@/lib/detect-subscriptions';
+import { BankLogo } from '@/components/BankLogo';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ACCOUNT_TYPES = [
   { id: 'current', label: 'Current Account', icon: Landmark, desc: 'Everyday spending' },
@@ -38,6 +41,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
   const { user } = useAuth();
   const demo = useDemoMode();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   // Step navigation
   const [step, setStep] = useState(1);
@@ -206,6 +210,10 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
       });
 
       toast.success(`Imported ${importedCount} transactions!`);
+      try { await detectSubscriptionsAndAlert(user.id); } catch (e) { console.warn('Subscription scan skipped', e); }
+      ['transactions', 'accounts', 'budgets', 'pulse_alerts', 'chat_messages', 'subscriptions', 'net_worth_history'].forEach(k =>
+        queryClient.invalidateQueries({ queryKey: [k] })
+      );
       onClose();
     } catch (err: any) {
       console.error(err);
@@ -286,9 +294,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
                   {filteredBanks.map(bank => (
                     <button key={bank.id} onClick={() => handleSelectBank(bank.id)}
                       className="flex flex-col items-center gap-2 p-3 rounded-xl border hover:border-primary/30 hover:bg-primary/5 transition-all">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: bank.colour }}>
-                        {bank.letter}
-                      </div>
+                      <BankLogo bankId={bank.id} size={40} />
                       <span className="text-[11px] font-medium text-center leading-tight">{bank.name}</span>
                     </button>
                   ))}
@@ -297,9 +303,7 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-muted/50">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: selectedBank?.colour || '#7F77DD' }}>
-                    {selectedBank?.letter || '?'}
-                  </div>
+                  <BankLogo bankId={bankId} size={40} />
                   <div className="flex-1">
                     <p className="text-sm font-medium">{bankId === 'other' ? 'Custom bank' : selectedBank?.name}</p>
                     <p className="text-[11px] text-muted-foreground">{ACCOUNT_TYPES.find(t => t.id === accountType)?.label}</p>
@@ -432,6 +436,13 @@ export function AddAccountModal({ onClose, onSave }: AddAccountModalProps) {
         {/* STEP 4: Review parsed transactions */}
         {step === 4 && (
           <div className="space-y-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs">
+              <p className="font-medium">Importing into</p>
+              <p className="text-muted-foreground">
+                {nickname || `${bankName} ${accountType}`}{bankName ? ` · ${bankName}` : ''}
+                {savedAccountId && <span className="font-mono opacity-70"> · {savedAccountId.slice(0, 8)}…</span>}
+              </p>
+            </div>
             {/* Summary bar */}
             {parseSummary && (
               <div className="flex flex-wrap gap-4 text-xs p-3 rounded-xl bg-muted/50">

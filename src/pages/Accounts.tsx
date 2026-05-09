@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Plus, ArrowUpRight, ArrowDownRight, MoreHorizontal, Pencil, Trash2, Upload, CalendarClock } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownRight, MoreHorizontal, Pencil, Trash2, Upload, CalendarClock, Wifi } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, formatDate } from '@/lib/finance';
 import { useAccounts, useTransactions, useAddAccount, useAddTransaction, useUpdateAccount, useDeleteAccount } from '@/hooks/useFinanceData';
@@ -10,24 +10,9 @@ import { toast } from 'sonner';
 import { ResponsiveContainer, LineChart, Line } from 'recharts';
 import { AddAccountModal } from '@/components/accounts/AddAccountModal';
 import { StatementUploadModal } from '@/components/accounts/StatementUploadModal';
+import { AutosyncModal } from '@/components/accounts/AutosyncModal';
 import { UploadReminderLabel } from '@/components/accounts/UploadReminderLabel';
-
-const institutionLogos: Record<string, { bg: string; letter: string; dark?: boolean }> = {
-  'Barclays': { bg: '#00AEEF', letter: 'B' },
-  'HSBC': { bg: '#DB0011', letter: 'H' },
-  'NatWest': { bg: '#4A0E8F', letter: 'N' },
-  'Lloyds': { bg: '#006A4D', letter: 'L' },
-  'Santander': { bg: '#EC0000', letter: 'S' },
-  'Monzo': { bg: '#FF3464', letter: 'M' },
-  'Starling': { bg: '#6935D3', letter: 'S' },
-  'Chase UK': { bg: '#117ACA', letter: 'C' },
-  'Halifax': { bg: '#005EB8', letter: 'H' },
-  'American Express': { bg: '#007BC1', letter: 'A' },
-  'Goldman Sachs': { bg: '#1A1A1A', letter: 'G' },
-  'Coinbase': { bg: '#0052FF', letter: 'C' },
-  'Binance': { bg: '#F3BA2F', letter: 'B', dark: true },
-  'Vanguard': { bg: '#961A1A', letter: 'V' },
-};
+import { BankLogo } from '@/components/BankLogo';
 
 const typeLabels: Record<string, string> = {
   current: 'Current accounts', savings: 'Savings accounts', credit_card: 'Credit cards',
@@ -49,6 +34,7 @@ export default function AccountsPage() {
   const demo = useDemoMode();
 
   const [showAddAccount, setShowAddAccount] = useState(false);
+  const [showAutosync, setShowAutosync] = useState(false);
   const [showAddTxn, setShowAddTxn] = useState(false);
   const [form, setForm] = useState({ name: '', type: 'current', institution: '', balance: '', colour: '#7F77DD' });
   const [txnForm, setTxnForm] = useState({ payee: '', amount: '', type: 'expense', category: 'Shopping', date: new Date().toISOString().split('T')[0], description: '' });
@@ -70,17 +56,14 @@ export default function AccountsPage() {
     const account = accounts.find(a => a.id === id);
     if (!account) return <div className="p-8 text-center text-muted-foreground">Account not found</div>;
     const accountTxns = allTransactions?.filter(t => t.account_id === id) ?? [];
-    const logo = institutionLogos[account.institution || ''];
 
     return (
       <div className="p-5 lg:p-8 max-w-4xl mx-auto">
         <Link to="/accounts" className="text-xs text-primary hover:underline mb-4 block">← All accounts</Link>
         <div className="sonfi-card mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-medium"
-              style={{ backgroundColor: logo?.bg || account.colour || '#7F77DD', color: logo?.dark ? '#1A1A1A' : '#fff' }}>
-              {logo?.letter || (account.institution?.[0] || 'A')}
-            </div>
+            <BankLogo institution={account.institution} fallbackColour={account.colour} size={48} rounded="xl" />
+
             <div className="flex-1">
               <h1 className="text-xl font-medium">{account.name}</h1>
               <p className="text-sm text-muted-foreground">{account.institution} · {account.type.replace('_', ' ')}</p>
@@ -192,7 +175,12 @@ export default function AccountsPage() {
     <div className="p-5 lg:p-8 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-medium">Accounts</h1>
-        <Button size="sm" onClick={() => setShowAddAccount(true)}><Plus size={16} /> Add account</Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => setShowAutosync(true)}>
+            <Wifi size={14} /> Autosync
+          </Button>
+          <Button size="sm" onClick={() => setShowAddAccount(true)}><Plus size={16} /> Add account</Button>
+        </div>
       </div>
 
       {(!accounts || accounts.length === 0) ? (
@@ -214,7 +202,6 @@ export default function AccountsPage() {
                 </div>
                 <div className="space-y-2">
                   {typeAccounts.map(a => {
-                    const logo = institutionLogos[a.institution || ''];
                     const monthIncome = allTransactions?.filter(t => t.account_id === a.id && t.type === 'income').reduce((s, t) => s + Number(t.amount), 0) ?? 0;
                     const monthExpenses = Math.abs(allTransactions?.filter(t => t.account_id === a.id && t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0) ?? 0);
                     const spark = Array.from({ length: 7 }, (_, i) => ({ v: Number(a.balance) + (Math.random() - 0.5) * 200 * (7 - i) }));
@@ -222,9 +209,8 @@ export default function AccountsPage() {
                     return (
                       <div key={a.id} className="sonfi-card hover:border-primary/20 transition-colors">
                         <div className="flex items-center gap-4">
-                          <Link to={`/accounts/${a.id}`} className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium flex-shrink-0"
-                            style={{ backgroundColor: logo?.bg || a.colour || '#7F77DD', color: logo?.dark ? '#1A1A1A' : '#fff' }}>
-                            {logo?.letter || (a.institution?.[0] || 'A')}
+                          <Link to={`/accounts/${a.id}`} className="flex-shrink-0">
+                            <BankLogo institution={a.institution} fallbackColour={a.colour} size={40} rounded="xl" />
                           </Link>
                           <Link to={`/accounts/${a.id}`} className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
@@ -305,6 +291,8 @@ export default function AccountsPage() {
           onClose={() => setUploadingAccount(null)}
         />
       )}
+
+      {showAutosync && <AutosyncModal onClose={() => setShowAutosync(false)} />}
 
       {/* Edit account modal */}
       {editingAccount && (
