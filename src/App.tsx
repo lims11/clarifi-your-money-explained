@@ -34,6 +34,8 @@ import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import SecurityPage from "./pages/Security";
 import NotFound from "./pages/NotFound";
+import AutosyncCallback from "./pages/AutosyncCallback";
+
 
 const queryClient = new QueryClient();
 
