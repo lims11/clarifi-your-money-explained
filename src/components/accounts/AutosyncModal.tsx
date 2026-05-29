@@ -144,7 +144,50 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
       setStep('type');
     } finally {
       setLinking(false);
+  };
+
+  const handleConnectReal = async () => {
+    if (!user) { toast.error('Please sign in'); return; }
+    if (!bankId || bankId === 'other') { toast.error('Pick a supported bank for real Open Banking'); return; }
+    setError('');
+    setLinking(true);
+    try {
+      const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+      // GoCardless uses institution IDs like "BARCLAYS_BARCGB22"; map a few common ones, else try uppercase id
+      const institutionMap: Record<string, string> = {
+        barclays: 'BARCLAYS_BARCGB22',
+        hsbc: 'HSBC_HBUKGB4B',
+        natwest: 'NATWEST_NWBKGB2L',
+        lloyds: 'LLOYDS_LOYDGB2L',
+        monzo: 'MONZO_MONZGB2L',
+        starling: 'STARLING_SRLGGB3L',
+        santander: 'SANTANDER_ABBYGB2L',
+        revolut: 'REVOLUT_REVOGB21',
+        nationwide: 'NATIONWIDE_NAIAGB21',
+        halifax: 'HALIFAX_HLFXGB21',
+      };
+      const institutionId = institutionMap[bankId] || bankId.toUpperCase();
+      const redirectUrl = `${window.location.origin}/autosync/callback`;
+      sessionStorage.setItem('sonfi:autosync:bank', bankName);
+
+      const r = await fetch(`${baseUrl}/functions/v1/gocardless`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        body: JSON.stringify({ action: 'create-link', institutionId, redirectUrl, userId: user.id }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data?.error || 'Could not start bank link');
+      // Persist requisitionId so the callback page can finalise even if reference param drops
+      sessionStorage.setItem('sonfi:autosync:requisitionId', data.requisitionId);
+      // Redirect user to GoCardless hosted bank login
+      window.location.href = `${data.link}${data.link.includes('?') ? '&' : '?'}requisitionId=${data.requisitionId}`;
+    } catch (e: any) {
+      console.error(e);
+      setError(e?.message || 'Could not start real bank link');
+      setLinking(false);
     }
+  };
+
   };
 
   const toggle = (i: number) => setParsed(p => p.map((t, idx) => idx === i ? { ...t, selected: !t.selected } : t));
