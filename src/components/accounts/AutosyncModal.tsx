@@ -275,9 +275,15 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
               </div>
             )}
 
-            <Button className="w-full" onClick={handleConnect} disabled={bankId === 'other' && !customBankName}>
-              <Wifi size={14} /> Connect to {bankName}
-            </Button>
+            <div className="space-y-2">
+              <Button className="w-full" onClick={handleConnectReal} disabled={(bankId === 'other' && !customBankName) || linking}>
+                {linking ? <><Loader2 size={14} className="animate-spin" /> Opening secure bank link…</> : <><ShieldCheck size={14} /> Connect with real bank (GoCardless)</>}
+              </Button>
+              <Button variant="outline" className="w-full" onClick={handleConnect} disabled={bankId === 'other' && !customBankName}>
+                <Wifi size={14} /> Use simulated demo
+              </Button>
+            </div>
+
           </>
         )}
 
