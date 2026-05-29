@@ -148,6 +148,7 @@ export async function uploadBankStatementFile(file: File, bankId: string): Promi
     summary: data?.summary || null,
   };
 }
+}): Promise<{ imported: number; skipped: number }> {
 
 
 export async function importParsedStatementTransactions(params: {
