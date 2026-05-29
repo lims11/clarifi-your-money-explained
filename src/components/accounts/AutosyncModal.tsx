@@ -6,9 +6,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { UK_BANKS, getBankById } from '@/data/ukBanks';
 import { BankLogo } from '@/components/BankLogo';
+import { ProgressStepper, type StepDef } from '@/components/ProgressStepper';
 import { importParsedStatementTransactions, STATEMENT_CATEGORIES, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
 import { detectSubscriptionsAndAlert } from '@/lib/detect-subscriptions';
 import { toast } from 'sonner';
+
 
 const ACCOUNT_TYPES = [
   { id: 'current', label: 'Current Account', icon: Landmark },
@@ -145,6 +147,46 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
     }
   };
 
+  const handleConnectReal = async () => {
+    if (!user) { toast.error('Please sign in'); return; }
+    if (!bankId || bankId === 'other') { toast.error('Pick a supported bank for real Open Banking'); return; }
+    setError('');
+    setLinking(true);
+    try {
+      const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const institutionMap: Record<string, string> = {
+        barclays: 'BARCLAYS_BARCGB22',
+        hsbc: 'HSBC_HBUKGB4B',
+        natwest: 'NATWEST_NWBKGB2L',
+        lloyds: 'LLOYDS_LOYDGB2L',
+        monzo: 'MONZO_MONZGB2L',
+        starling: 'STARLING_SRLGGB3L',
+        santander: 'SANTANDER_ABBYGB2L',
+        revolut: 'REVOLUT_REVOGB21',
+        nationwide: 'NATIONWIDE_NAIAGB21',
+        halifax: 'HALIFAX_HLFXGB21',
+      };
+      const institutionId = institutionMap[bankId] || bankId.toUpperCase();
+      const redirectUrl = `${window.location.origin}/autosync/callback`;
+      sessionStorage.setItem('sonfi:autosync:bank', bankName);
+
+      const r = await fetch(`${baseUrl}/functions/v1/gocardless`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        body: JSON.stringify({ action: 'create-link', institutionId, redirectUrl, userId: user.id }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data?.error || 'Could not start bank link');
+      sessionStorage.setItem('sonfi:autosync:requisitionId', data.requisitionId);
+      window.location.href = `${data.link}${data.link.includes('?') ? '&' : '?'}requisitionId=${data.requisitionId}`;
+    } catch (e: any) {
+      console.error(e);
+      setError(e?.message || 'Could not start real bank link');
+      setLinking(false);
+    }
+  };
+
+
   const toggle = (i: number) => setParsed(p => p.map((t, idx) => idx === i ? { ...t, selected: !t.selected } : t));
   const toggleAll = (sel: boolean) => setParsed(p => p.map(t => ({ ...t, selected: sel })));
   const selectedCount = parsed.filter(t => t.selected).length;
@@ -153,7 +195,7 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
     if (!user || !accountId) return;
     setImporting(true);
     try {
-      const count = await importParsedStatementTransactions({
+      const result: any = await importParsedStatementTransactions({
         userId: user.id,
         accountId,
         accountName,
@@ -162,7 +204,10 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
         filename: `autosync-${bankId}.json`,
         transactions: parsed,
       });
-      toast.success(`Imported ${count} transactions from ${bankName}`);
+      const imported = typeof result === 'number' ? result : result?.imported ?? 0;
+      const skipped = typeof result === 'number' ? 0 : result?.skipped ?? 0;
+      if (skipped > 0) toast.success(`Imported ${imported} (${skipped} duplicates skipped)`);
+      else toast.success(`Imported ${imported} transactions from ${bankName}`);
       try { await detectSubscriptionsAndAlert(user.id); } catch (e) { console.warn('Subscription scan skipped', e); }
       ['accounts', 'transactions', 'budgets', 'pulse_alerts', 'chat_messages', 'subscriptions'].forEach(k =>
         queryClient.invalidateQueries({ queryKey: [k] })
@@ -175,6 +220,7 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
       setImporting(false);
     }
   };
+
 
   const fmt = (n: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(n);
 
@@ -197,12 +243,23 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
           <Button variant="ghost" size="sm" onClick={onClose}>Close</Button>
         </div>
 
+        <ProgressStepper
+          steps={[
+            { id: 'bank', label: 'Bank', status: step === 'bank' ? 'active' : 'done' },
+            { id: 'type', label: 'Account', status: step === 'type' ? 'active' : (step === 'bank' ? 'pending' : 'done') },
+            { id: 'linking', label: 'Connect', status: step === 'linking' ? 'active' : (['review'].includes(step) ? 'done' : 'pending') },
+            { id: 'review', label: 'Review', status: step === 'review' ? 'active' : 'pending' },
+            { id: 'import', label: 'Import', status: 'pending' },
+          ] as StepDef[]}
+        />
+
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3 flex items-start gap-2">
           <ShieldCheck size={14} className="mt-0.5 text-amber-700 dark:text-amber-400 flex-shrink-0" />
           <p className="text-[11px] text-amber-900 dark:text-amber-200">
-            <strong>Demo Autosync:</strong> a regulated Open Banking provider (TrueLayer / GoCardless) is required for live sync. This flow simulates the experience using realistic generated transactions so the end-to-end import works today.
+            <strong>Demo Autosync:</strong> live GoCardless Open Banking is configured at the backend. The UI currently links via the simulated flow; click <em>Connect with real bank</em> on the bank step to start the GoCardless hosted flow.
           </p>
         </div>
+
 
         {/* STEP: pick bank */}
         {step === 'bank' && (
@@ -258,9 +315,15 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
               </div>
             )}
 
-            <Button className="w-full" onClick={handleConnect} disabled={bankId === 'other' && !customBankName}>
-              <Wifi size={14} /> Connect to {bankName}
-            </Button>
+            <div className="space-y-2">
+              <Button className="w-full" onClick={handleConnectReal} disabled={(bankId === 'other' && !customBankName) || linking}>
+                {linking ? <><Loader2 size={14} className="animate-spin" /> Opening secure bank link…</> : <><ShieldCheck size={14} /> Connect with real bank (GoCardless)</>}
+              </Button>
+              <Button variant="outline" className="w-full" onClick={handleConnect} disabled={bankId === 'other' && !customBankName}>
+                <Wifi size={14} /> Use simulated demo
+              </Button>
+            </div>
+
           </>
         )}
 

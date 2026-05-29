@@ -216,7 +216,7 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
     try {
       try { await saveReminderPreference(); } catch (e) { console.warn('Reminder save skipped:', e); }
 
-      const importedCount = await importParsedStatementTransactions({
+      const result: any = await importParsedStatementTransactions({
         userId: user.id,
         accountId: account.id,
         accountName: account.name,
@@ -225,13 +225,22 @@ export function StatementUploadModal({ account, onClose }: StatementUploadModalP
         filename: file?.name || 'statement.pdf',
         transactions: parsedTransactions,
       });
+      const imported = typeof result === 'number' ? result : result?.imported ?? 0;
+      const skipped = typeof result === 'number' ? 0 : result?.skipped ?? 0;
 
-      toast.success(`Imported ${importedCount} transactions`);
+      if (imported === 0 && skipped > 0) {
+        toast.info(`No new transactions — ${skipped} already imported.`);
+      } else if (skipped > 0) {
+        toast.success(`Imported ${imported} transactions (${skipped} duplicates skipped).`);
+      } else {
+        toast.success(`Imported ${imported} transactions`);
+      }
       try { await detectSubscriptionsAndAlert(user.id); } catch (e) { console.warn('Subscription scan skipped', e); }
       ['transactions', 'accounts', 'budgets', 'pulse_alerts', 'chat_messages', 'subscriptions', 'net_worth_history'].forEach(k =>
         queryClient.invalidateQueries({ queryKey: [k] })
       );
       onClose();
+
     } catch (error: any) {
       console.error('Import upload error:', error);
       toast.error(getStatementUploadError(error));

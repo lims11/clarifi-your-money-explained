@@ -140,6 +140,7 @@ export async function uploadBankStatementFile(file: File, bankId: string): Promi
     throw new Error(data?.error || `Statement analyser returned ${response.status}`);
   }
 
+
   return {
     transactions: (data?.transactions || []).map((transaction: Omit<ParsedStatementTransaction, 'selected'>) => ({
       ...transaction,
@@ -149,6 +150,7 @@ export async function uploadBankStatementFile(file: File, bankId: string): Promi
   };
 }
 
+
 export async function importParsedStatementTransactions(params: {
   userId: string;
   accountId: string;
@@ -157,12 +159,43 @@ export async function importParsedStatementTransactions(params: {
   bankId: string;
   filename: string;
   transactions: ParsedStatementTransaction[];
-}) {
+}): Promise<{ imported: number; skipped: number }> {
+
   const selectedTransactions = params.transactions.filter((transaction) => transaction.selected);
   if (selectedTransactions.length === 0) throw new Error('No transactions selected.');
   const accountId = await resolveImportAccount(params);
 
-  const rows = selectedTransactions.map((transaction) => ({
+  // Duplicate detection — pull existing transactions in the date range for this account
+  const dates = selectedTransactions.map(t => t.date).sort();
+  const minDate = dates[0];
+  const maxDate = dates[dates.length - 1];
+  const { data: existing } = await supabase
+    .from('transactions')
+    .select('date, amount, payee, description')
+    .eq('user_id', params.userId)
+    .eq('account_id', accountId)
+    .gte('date', minDate)
+    .lte('date', maxDate);
+
+  const normalise = (s?: string | null) => (s || '').toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 40);
+  const existingKeys = new Set(
+    (existing || []).map(e => `${e.date}|${Number(e.amount).toFixed(2)}|${normalise(e.payee || e.description)}`)
+  );
+
+  const fresh: ParsedStatementTransaction[] = [];
+  let skipped = 0;
+  for (const t of selectedTransactions) {
+    const key = `${t.date}|${Number(t.amount).toFixed(2)}|${normalise(t.description)}`;
+    if (existingKeys.has(key)) { skipped += 1; continue; }
+    existingKeys.add(key);
+    fresh.push(t);
+  }
+
+  if (fresh.length === 0) {
+    return { imported: 0, skipped } as any;
+  }
+
+  const rows = fresh.map((transaction) => ({
     user_id: params.userId,
     account_id: accountId,
     date: transaction.date,
@@ -200,7 +233,7 @@ export async function importParsedStatementTransactions(params: {
     if (balanceError) throw balanceError;
   }
 
-  const orderedDates = selectedTransactions.map((transaction) => transaction.date).sort();
+  const orderedDates = fresh.map((transaction) => transaction.date).sort();
   const { error: uploadError } = await supabase.from('statement_uploads').insert({
     user_id: params.userId,
     account_id: accountId,
@@ -210,10 +243,10 @@ export async function importParsedStatementTransactions(params: {
     period_start: orderedDates[0] || null,
     period_end: orderedDates[orderedDates.length - 1] || null,
     transactions_found: params.transactions.length,
-    transactions_imported: selectedTransactions.length,
+    transactions_imported: fresh.length,
     status: 'complete',
   });
   if (uploadError) throw uploadError;
 
-  return selectedTransactions.length;
+  return { imported: fresh.length, skipped } as any;
 }
