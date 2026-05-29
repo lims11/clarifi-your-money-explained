@@ -60,7 +60,9 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/cookies" element={<Cookies />} />
-            <Route path="/security" element={<SecurityPage />} />
+            <Route path="/onboarding" element={<ProtectedRoute requireAuth={true}><Onboarding /></ProtectedRoute>} />
+            <Route path="/autosync/callback" element={<ProtectedRoute requireAuth={true}><AutosyncCallback /></ProtectedRoute>} />
+
             <Route path="/login" element={<Login />} />
             <Route path="/onboarding" element={<ProtectedRoute requireAuth={true}><Onboarding /></ProtectedRoute>} />
 
