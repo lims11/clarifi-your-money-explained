@@ -6,9 +6,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { UK_BANKS, getBankById } from '@/data/ukBanks';
 import { BankLogo } from '@/components/BankLogo';
+import { ProgressStepper, type StepDef } from '@/components/ProgressStepper';
 import { importParsedStatementTransactions, STATEMENT_CATEGORIES, type ParsedStatementTransaction } from '@/lib/bank-statement-upload';
 import { detectSubscriptionsAndAlert } from '@/lib/detect-subscriptions';
 import { toast } from 'sonner';
+
 
 const ACCOUNT_TYPES = [
   { id: 'current', label: 'Current Account', icon: Landmark },
