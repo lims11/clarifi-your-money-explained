@@ -197,9 +197,6 @@ export async function importParsedStatementTransactions(params: {
     ai_category_reason: transaction.suggestedCategory ? 'AI categorised from statement' : null,
   }));
 
-    ai_category_reason: transaction.suggestedCategory ? 'AI categorised from statement' : null,
-  }));
-
   for (let index = 0; index < rows.length; index += 50) {
     const batch = rows.slice(index, index + 50);
     const { error } = await supabase.from('transactions').insert(batch);
@@ -224,7 +221,7 @@ export async function importParsedStatementTransactions(params: {
     if (balanceError) throw balanceError;
   }
 
-  const orderedDates = selectedTransactions.map((transaction) => transaction.date).sort();
+  const orderedDates = fresh.map((transaction) => transaction.date).sort();
   const { error: uploadError } = await supabase.from('statement_uploads').insert({
     user_id: params.userId,
     account_id: accountId,
@@ -234,10 +231,10 @@ export async function importParsedStatementTransactions(params: {
     period_start: orderedDates[0] || null,
     period_end: orderedDates[orderedDates.length - 1] || null,
     transactions_found: params.transactions.length,
-    transactions_imported: selectedTransactions.length,
+    transactions_imported: fresh.length,
     status: 'complete',
   });
   if (uploadError) throw uploadError;
 
-  return selectedTransactions.length;
+  return { imported: fresh.length, skipped } as any;
 }
