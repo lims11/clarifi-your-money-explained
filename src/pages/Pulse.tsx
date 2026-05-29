@@ -1,12 +1,15 @@
-import { useState } from 'react';
-import { AlertTriangle, Lightbulb, TrendingUp, CheckCircle2, MessageSquare, Bell } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, Lightbulb, TrendingUp, CheckCircle2, MessageSquare, Bell, Repeat } from 'lucide-react';
 import { usePulseAlerts, useMarkAlertRead, useMarkAllAlertsRead } from '@/hooks/useFinanceData';
 import { formatRelativeTime } from '@/lib/finance';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
-const tabs = ['All', 'Warnings', 'Insights', 'Tips', 'Success'];
+const tabs = ['All', 'Warnings', 'Insights', 'Tips', 'Success', 'Subscriptions'];
+
 const typeConfig: Record<string, { icon: React.ElementType; color: string; border: string; bg: string }> = {
   warning: { icon: AlertTriangle, color: 'text-amber', border: 'border-l-amber', bg: 'bg-amber/5' },
   insight: { icon: Lightbulb, color: 'text-primary', border: 'border-l-primary', bg: 'bg-primary/5' },
