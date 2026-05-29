@@ -153,7 +153,7 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
     if (!user || !accountId) return;
     setImporting(true);
     try {
-      const count = await importParsedStatementTransactions({
+      const result: any = await importParsedStatementTransactions({
         userId: user.id,
         accountId,
         accountName,
@@ -162,7 +162,10 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
         filename: `autosync-${bankId}.json`,
         transactions: parsed,
       });
-      toast.success(`Imported ${count} transactions from ${bankName}`);
+      const imported = typeof result === 'number' ? result : result?.imported ?? 0;
+      const skipped = typeof result === 'number' ? 0 : result?.skipped ?? 0;
+      if (skipped > 0) toast.success(`Imported ${imported} (${skipped} duplicates skipped)`);
+      else toast.success(`Imported ${imported} transactions from ${bankName}`);
       try { await detectSubscriptionsAndAlert(user.id); } catch (e) { console.warn('Subscription scan skipped', e); }
       ['accounts', 'transactions', 'budgets', 'pulse_alerts', 'chat_messages', 'subscriptions'].forEach(k =>
         queryClient.invalidateQueries({ queryKey: [k] })
@@ -175,6 +178,7 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
       setImporting(false);
     }
   };
+
 
   const fmt = (n: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(n);
 
