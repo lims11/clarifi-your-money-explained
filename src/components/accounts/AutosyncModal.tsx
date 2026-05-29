@@ -203,12 +203,23 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
           <Button variant="ghost" size="sm" onClick={onClose}>Close</Button>
         </div>
 
+        <ProgressStepper
+          steps={[
+            { id: 'bank', label: 'Bank', status: step === 'bank' ? 'active' : 'done' },
+            { id: 'type', label: 'Account', status: step === 'type' ? 'active' : (step === 'bank' ? 'pending' : 'done') },
+            { id: 'linking', label: 'Connect', status: step === 'linking' ? 'active' : (['review'].includes(step) ? 'done' : 'pending') },
+            { id: 'review', label: 'Review', status: step === 'review' ? 'active' : 'pending' },
+            { id: 'import', label: 'Import', status: 'pending' },
+          ] as StepDef[]}
+        />
+
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3 flex items-start gap-2">
           <ShieldCheck size={14} className="mt-0.5 text-amber-700 dark:text-amber-400 flex-shrink-0" />
           <p className="text-[11px] text-amber-900 dark:text-amber-200">
-            <strong>Demo Autosync:</strong> a regulated Open Banking provider (TrueLayer / GoCardless) is required for live sync. This flow simulates the experience using realistic generated transactions so the end-to-end import works today.
+            <strong>Demo Autosync:</strong> live GoCardless Open Banking is configured at the backend. The UI currently links via the simulated flow; click <em>Connect with real bank</em> on the bank step to start the GoCardless hosted flow.
           </p>
         </div>
+
 
         {/* STEP: pick bank */}
         {step === 'bank' && (
