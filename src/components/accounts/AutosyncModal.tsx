@@ -144,6 +144,7 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
       setStep('type');
     } finally {
       setLinking(false);
+    }
   };
 
   const handleConnectReal = async () => {
@@ -153,7 +154,6 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
     setLinking(true);
     try {
       const baseUrl = import.meta.env.VITE_SUPABASE_URL;
-      // GoCardless uses institution IDs like "BARCLAYS_BARCGB22"; map a few common ones, else try uppercase id
       const institutionMap: Record<string, string> = {
         barclays: 'BARCLAYS_BARCGB22',
         hsbc: 'HSBC_HBUKGB4B',
@@ -177,9 +177,7 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data?.error || 'Could not start bank link');
-      // Persist requisitionId so the callback page can finalise even if reference param drops
       sessionStorage.setItem('sonfi:autosync:requisitionId', data.requisitionId);
-      // Redirect user to GoCardless hosted bank login
       window.location.href = `${data.link}${data.link.includes('?') ? '&' : '?'}requisitionId=${data.requisitionId}`;
     } catch (e: any) {
       console.error(e);
@@ -188,7 +186,6 @@ export function AutosyncModal({ onClose }: AutosyncModalProps) {
     }
   };
 
-  };
 
   const toggle = (i: number) => setParsed(p => p.map((t, idx) => idx === i ? { ...t, selected: !t.selected } : t));
   const toggleAll = (sel: boolean) => setParsed(p => p.map(t => ({ ...t, selected: sel })));
