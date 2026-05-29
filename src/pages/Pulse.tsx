@@ -18,13 +18,22 @@ const typeConfig: Record<string, { icon: React.ElementType; color: string; borde
 };
 
 export default function PulsePage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('All');
+  const [subs, setSubs] = useState<any[]>([]);
   const { data: alerts, isLoading } = usePulseAlerts();
   const markRead = useMarkAlertRead();
   const markAllRead = useMarkAllAlertsRead();
 
+  useEffect(() => {
+    if (!user || activeTab !== 'Subscriptions') return;
+    supabase.from('subscriptions').select('*').eq('user_id', user.id).eq('is_active', true)
+      .then(({ data }) => setSubs(data || []));
+  }, [user, activeTab]);
+
   const typeMap: Record<string, string> = { Warnings: 'warning', Insights: 'insight', Tips: 'tip', Success: 'success' };
   const filtered = activeTab === 'All' ? alerts : alerts?.filter(a => a.type === typeMap[activeTab]);
+  const totalMonthly = subs.reduce((s, x) => s + Number(x.amount || 0), 0);
 
   if (isLoading) return <div className="p-5 lg:p-8 max-w-4xl mx-auto space-y-4"><Skeleton className="h-8 w-32" />{[1,2,3].map(i => <Skeleton key={i} className="h-24 rounded-2xl" />)}</div>;
 
@@ -39,10 +48,29 @@ export default function PulsePage() {
           <button key={tab} onClick={() => setActiveTab(tab)} className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${activeTab === tab ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>{tab}</button>
         ))}
       </div>
-      {(!filtered || filtered.length === 0) ? (
+
+      {activeTab === 'Subscriptions' ? (
+        subs.length === 0 ? (
+          <div className="sonfi-card text-center py-12"><Repeat className="mx-auto mb-3 text-muted-foreground" size={32} /><p className="text-lg font-medium mb-2">No subscriptions detected yet</p><p className="text-sm text-muted-foreground">Import a statement or autosync a bank — Sonfi will spot recurring charges automatically.</p></div>
+        ) : (
+          <div className="space-y-3">
+            <div className="sonfi-card flex items-center justify-between">
+              <div><p className="label-text">Estimated monthly spend</p><p className="text-2xl font-semibold">£{totalMonthly.toFixed(2)}</p></div>
+              <div className="text-right"><p className="label-text">Active</p><p className="text-2xl font-semibold">{subs.length}</p></div>
+            </div>
+            {subs.map(s => (
+              <div key={s.id} className="sonfi-card flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0"><Repeat size={16} className="text-primary flex-shrink-0" /><div className="min-w-0"><p className="text-sm font-medium truncate">{s.service_name}</p><p className="text-xs text-muted-foreground">{s.billing_frequency} · {s.usage_status}</p></div></div>
+                <p className="text-sm font-semibold">£{Number(s.amount).toFixed(2)}</p>
+              </div>
+            ))}
+          </div>
+        )
+      ) : (!filtered || filtered.length === 0) ? (
         <div className="sonfi-card text-center py-12"><Bell className="mx-auto mb-3 text-muted-foreground" size={32} /><p className="text-lg font-medium mb-2">No alerts</p><p className="text-sm text-muted-foreground">Sonfi will notify you when something needs attention</p></div>
       ) : (
         <div className="space-y-3">
+
           {filtered.map(a => {
             const config = typeConfig[a.type] || typeConfig.insight;
             const Icon = config.icon;
