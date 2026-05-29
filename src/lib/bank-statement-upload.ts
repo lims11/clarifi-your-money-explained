@@ -148,7 +148,6 @@ export async function uploadBankStatementFile(file: File, bankId: string): Promi
     summary: data?.summary || null,
   };
 }
-}): Promise<{ imported: number; skipped: number }> {
 
 
 export async function importParsedStatementTransactions(params: {
@@ -159,7 +158,8 @@ export async function importParsedStatementTransactions(params: {
   bankId: string;
   filename: string;
   transactions: ParsedStatementTransaction[];
-}): Promise<{ imported: number; skipped: number }> | Promise<number> | any {
+}): Promise<{ imported: number; skipped: number }> {
+
   const selectedTransactions = params.transactions.filter((transaction) => transaction.selected);
   if (selectedTransactions.length === 0) throw new Error('No transactions selected.');
   const accountId = await resolveImportAccount(params);
