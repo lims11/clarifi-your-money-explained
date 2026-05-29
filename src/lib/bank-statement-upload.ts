@@ -138,6 +138,7 @@ export async function uploadBankStatementFile(file: File, bankId: string): Promi
   const data = parseJsonResponse(responseText);
   if (!response.ok || data?.error) {
     throw new Error(data?.error || `Statement analyser returned ${response.status}`);
+  }
 
 
   return {
