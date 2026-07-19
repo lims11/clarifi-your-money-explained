@@ -35,6 +35,7 @@ import Cookies from "./pages/Cookies";
 import SecurityPage from "./pages/Security";
 import NotFound from "./pages/NotFound";
 import AutosyncCallback from "./pages/AutosyncCallback";
+import OAuthConsent from "./pages/OAuthConsent";
 
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/autosync/callback" element={<ProtectedRoute requireAuth={true}><AutosyncCallback /></ProtectedRoute>} />
 
             <Route path="/login" element={<Login />} />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/onboarding" element={<ProtectedRoute requireAuth={true}><Onboarding /></ProtectedRoute>} />
 
             {/* Authenticated routes */}
