@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "sdk_version": "0.23.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ghontbbwexqxylwcsuhq.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "sonfi-mcp",
+      "version": "0.1.0",
+      "title": "Sonfi"
+    },
+    "tools": [
+      {
+        "name": "financial_summary",
+        "title": "Financial summary",
+        "description": "Return the signed-in user's overall financial snapshot: net worth, this-month income and expenses, and top spending categories.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_accounts",
+        "title": "List accounts",
+        "description": "List all of the signed-in user's Sonfi bank/investment/credit accounts with balances.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_transactions",
+        "title": "List transactions",
+        "description": "List the signed-in user's recent transactions. Optionally filter by category or date range.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "default": 50,
+              "description": "Max number of transactions to return.",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "category": {
+              "description": "Filter by category name.",
+              "type": "string"
+            },
+            "since": {
+              "description": "ISO date; return transactions on or after this date.",
+              "type": "string"
+            },
+            "until": {
+              "description": "ISO date; return transactions on or before this date.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_budgets",
+        "title": "List budgets",
+        "description": "List the signed-in user's monthly budgets by category.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_goals",
+        "title": "List savings goals",
+        "description": "List the signed-in user's savings goals with progress towards target.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
