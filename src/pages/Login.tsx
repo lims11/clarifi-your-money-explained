@@ -6,6 +6,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import sonfiLogo from '@/assets/sonfi-logo-vertical.png';
 
+// Only allow same-origin relative paths for post-auth redirect.
+function safeNext(raw: string | null): string | null {
+  if (!raw) return null;
+  if (!raw.startsWith('/') || raw.startsWith('//')) return null;
+  return raw;
+}
+
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const [tab, setTab] = useState<'signin' | 'signup'>(searchParams.get('tab') === 'signup' ? 'signup' : 'signin');
@@ -17,6 +24,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
+  const next = safeNext(searchParams.get('next'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,14 +33,19 @@ export default function LoginPage() {
 
     if (tab === 'signup') {
       if (password.length < 6) { setError('Password must be at least 6 characters'); setLoading(false); return; }
-      const { error } = await signUp(email, password, fullName);
+      const emailRedirectTo = window.location.origin + (next ?? '/dashboard');
+      const { error } = await signUp(email, password, fullName, emailRedirectTo);
       if (error) { setError(error.message); setLoading(false); return; }
       toast.success('Account created! Please check your email to verify your account.');
       setLoading(false);
     } else {
       const { error } = await signIn(email, password);
       if (error) { setError(error.message); setLoading(false); return; }
-      navigate('/dashboard');
+      if (next) {
+        window.location.href = next;
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
